@@ -1,0 +1,51 @@
+{
+  "layout": {
+    "back_to_hub": "Voltar ao Hub"
+  },
+  "hub": {
+    "title": "Core Utilities & Architecture Sandbox",
+    "subtitle": "Utilitários sem enrolação (Zero-BS), feeds ao vivo e referências técnicas para engenharia de software moderna.",
+    "tools": {
+      "npm_verify": {
+        "name": "OSV Dependency Scanner",
+        "description": "Análise de vulnerabilidades na supply chain do ecossistema Node.js (OSV API)."
+      },
+      "rag_sandbox": {
+        "name": "RAG Chunking Sandbox",
+        "description": "Cole seus textos e visualize como as estratégias de chunking quebram seus documentos para Bancos Vetoriais."
+      },
+      "token_estimator": {
+        "name": "Token Estimator & Pricing",
+        "description": "Valide o tamanho de System Prompts gigantes e conte os tokens em diferentes modelos na hora."
+      },
+      "cicd_builder": {
+        "name": "Pipeline Configurator",
+        "description": "Gere configurações completas de pipeline YAML para GitHub Actions ou GitLab CI prontas para produção."
+      },
+      "mcp_inspector": {
+        "name": "MCP Inspector",
+        "description": "Conecte, debuge e teste as tools e resources do seu Model Context Protocol server localmente."
+      }
+    },
+    "actions": {
+      "start": "Iniciar Ferramenta",
+      "coming_soon": "Em Breve"
+    },
+    "alert": {
+      "title": "URGENTE: Ataque de Supply Chain NPM \"ChainDrop\"",
+      "text": "Um worm massivo de auto-propagação comprometeu mais de 440 pacotes npm, incluindo a popular biblioteca <strong>keyv</strong>. O malware usa hooks de preinstall para extrair credenciais (npm, GitHub, AWS). Use nosso Scanner de Dependências imediatamente para verificar seus ambientes locais.",
+      "button": "Escaneie seu package.json Agora"
+    }
+  },
+  "tech_feed": {
+    "trending_hn": "HN Top",
+    "trending_gh": "GH Trending",
+    "updated": "Atualizado às",
+    "refresh": "Recarregar",
+    "loading": "Carregando feed..."
+  },
+  "snippets": {
+    "title": "Quick Snippets",
+    "copy": "Copiar código"
+  }
+}

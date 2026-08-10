@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { X, Copy, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { snippetsData } from '../data/snippets';
 import '../index.css'; // Garantir que estilos globais apliquem
 
 export default function SnippetModal({ snippetId, onClose }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = useState(false);
 
   if (!snippetId || !snippetsData[snippetId]) return null;
@@ -43,7 +45,7 @@ export default function SnippetModal({ snippetId, onClose }) {
             className="button outline" 
             style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', padding: '0.4rem', background: 'var(--bg-color)' }}
             onClick={handleCopy}
-            title="Copiar código"
+            title={t('snippets.copy')}
           >
             {copied ? <Check size={14} style={{ color: 'var(--accent-color)' }} /> : <Copy size={14} />}
           </button>

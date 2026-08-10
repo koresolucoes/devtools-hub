@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldAlert, ArrowRight, Plug, BrainCircuit, Baseline, Flag } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation, Trans } from 'react-i18next';
 import AdBanner from '../components/AdBanner';
 import SnippetsSidebar from '../components/SnippetsSidebar';
 import TechFeed from '../components/TechFeed';
@@ -9,58 +10,61 @@ import SnippetModal from '../components/SnippetModal';
 import '../index.css';
 
 function Hub() {
+  const { t } = useTranslation();
   const [activeSnippet, setActiveSnippet] = useState(null);
+  
   const tools = [
     {
       id: 'npm-verify',
-      name: 'OSV Dependency Scanner',
-      description: 'Análise de vulnerabilidades na supply chain do ecossistema Node.js (OSV API).',
-      icon: <ShieldAlert size={32} />,
+      name: t('hub.tools.npm_verify.name'),
+      description: t('hub.tools.npm_verify.description'),
+      icon: <ShieldAlert size={20} />,
       path: '/npm-verify',
       status: 'active'
     },
     {
       id: 'rag-sandbox',
-      name: 'RAG Chunking Sandbox',
-      description: 'Cole seus textos e visualize como as estratégias de chunking quebram seus documentos para Bancos Vetoriais.',
-      icon: <BrainCircuit size={32} />,
+      name: t('hub.tools.rag_sandbox.name'),
+      description: t('hub.tools.rag_sandbox.description'),
+      icon: <BrainCircuit size={20} />,
       path: '/rag-sandbox',
       status: 'active'
     },
     {
       id: 'token-estimator',
-      name: 'Token Estimator & Pricing',
-      description: 'Valide o tamanho de System Prompts gigantes e conte os tokens em diferentes modelos na hora.',
-      icon: <Baseline size={32} />,
+      name: t('hub.tools.token_estimator.name'),
+      description: t('hub.tools.token_estimator.description'),
+      icon: <Baseline size={20} />,
       path: '/token-estimator',
       status: 'active'
     },
     {
       id: 'cicd-builder',
-      name: 'Pipeline Configurator',
-      description: 'Gere configurações completas de pipeline YAML para GitHub Actions ou GitLab CI prontas para produção.',
-      icon: <Flag size={32} />,
+      name: t('hub.tools.cicd_builder.name'),
+      description: t('hub.tools.cicd_builder.description'),
+      icon: <Plug size={20} />,
       path: '/cicd-builder',
       status: 'active'
     },
     {
       id: 'mcp-inspector',
-      name: 'MCP Inspector',
-      description: 'Conecte, debuge e teste as tools e resources do seu Model Context Protocol server localmente.',
-      icon: <Plug size={32} />,
-      path: '#',
+      name: t('hub.tools.mcp_inspector.name'),
+      description: t('hub.tools.mcp_inspector.description'),
+      icon: <Flag size={20} />,
+      path: '/mcp',
       status: 'coming-soon'
     }
   ];
 
   return (
-    <div className="hub-container" style={{ maxWidth: '100%', padding: '0' }}>
-      <AdBanner />
+    <div className="hub-container">
       
-      <header className="hub-header" style={{ marginBottom: '3rem', textAlign: 'left', padding: '0 2rem' }}>
-        <h1 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Core Utilities & Architecture Sandbox</h1>
-        <p style={{ margin: '0', maxWidth: '800px', fontSize: '1rem' }}>
-          Zero-BS utilities, live data feeds, and technical references for modern software engineering.
+      <header className="hub-header" style={{ textAlign: 'center', marginBottom: '3rem', paddingTop: '2rem' }}>
+        <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
+          {t('hub.title')}
+        </h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', maxWidth: '600px', margin: '0 auto' }}>
+          {t('hub.subtitle')}
         </p>
       </header>
 
@@ -84,13 +88,10 @@ function Hub() {
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
               <ShieldAlert size={24} style={{ color: 'var(--danger)', flexShrink: 0, marginTop: '2px' }} />
               <div>
-                <h3 style={{ color: 'var(--danger)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>URGENT: "ChainDrop" NPM Supply Chain Attack</h3>
-                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: '1.5' }}>
-                  A massive self-propagating worm has compromised over 440 npm packages, including the popular <strong>keyv</strong> library. 
-                  The malware uses preinstall hooks to exfiltrate credentials (npm, GitHub, AWS). Use our Dependency Scanner immediately to verify your local environments.
-                </p>
+                <h3 style={{ color: 'var(--danger)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>{t('hub.alert.title')}</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: '1.5' }} dangerouslySetInnerHTML={{ __html: t('hub.alert.text') }} />
                 <Link to="/npm-verify" className="button" style={{ background: 'var(--danger)', color: 'white', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-                  Scan Your package.json Now <ArrowRight size={16} />
+                  {t('hub.alert.button')} <ArrowRight size={16} />
                 </Link>
               </div>
             </div>
@@ -109,11 +110,11 @@ function Hub() {
               </div>
               {tool.status === 'active' ? (
                 <Link to={tool.path} className="tool-card-action button outline">
-                  Iniciar Ferramenta <ArrowRight size={16} />
+                  {t('hub.actions.start')} <ArrowRight size={16} />
                 </Link>
               ) : (
                 <button className="tool-card-action button" disabled>
-                  Em Breve
+                  {t('hub.actions.coming_soon')}
                 </button>
               )}
             </div>

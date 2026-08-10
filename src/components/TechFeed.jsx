@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Rss, ExternalLink, Flame, GitBranch, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-function getRelativeTime(timestamp) {
-  const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+function getRelativeTime(timestamp, language = 'en') {
+  const rtf = new Intl.RelativeTimeFormat(language.split('-')[0], { numeric: 'auto' });
   const daysDifference = Math.round((timestamp * 1000 - Date.now()) / (1000 * 60 * 60 * 24));
   const hoursDifference = Math.round((timestamp * 1000 - Date.now()) / (1000 * 60 * 60));
   
@@ -11,6 +12,7 @@ function getRelativeTime(timestamp) {
 }
 
 export default function TechFeed() {
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('hn'); // 'hn' or 'github'
   const [stories, setStories] = useState([]);
   const [repos, setRepos] = useState([]);
@@ -58,27 +60,27 @@ export default function TechFeed() {
           onClick={() => setActiveTab('hn')}
           style={{ flex: 1, padding: '1rem', background: 'transparent', border: 'none', borderBottom: activeTab === 'hn' ? '2px solid var(--accent-color)' : '2px solid transparent', color: activeTab === 'hn' ? 'var(--text-primary)' : 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: 500 }}
         >
-          <Flame size={16} style={{ color: activeTab === 'hn' ? 'var(--danger)' : 'currentColor' }}/> HN Top
+          <Flame size={16} style={{ color: activeTab === 'hn' ? 'var(--danger)' : 'currentColor' }}/> {t('tech_feed.trending_hn')}
         </button>
         <button 
           onClick={() => setActiveTab('github')}
           style={{ flex: 1, padding: '1rem', background: 'transparent', border: 'none', borderBottom: activeTab === 'github' ? '2px solid var(--accent-color)' : '2px solid transparent', color: activeTab === 'github' ? 'var(--text-primary)' : 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: 500 }}
         >
-          <GitBranch size={16} /> GH Trending
+          <GitBranch size={16} /> {t('tech_feed.trending_gh')}
         </button>
       </div>
 
       <div className="feed-actions" style={{ padding: '0.5rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-bg)', borderBottom: '1px solid var(--surface-border)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-        <span>Updated {new Date(lastUpdated).toLocaleTimeString()}</span>
+        <span>{t('tech_feed.updated')} {new Date(lastUpdated).toLocaleTimeString()}</span>
         <button onClick={fetchData} disabled={loading} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <RefreshCw size={12} className={loading ? 'spinning' : ''} /> Refresh
+          <RefreshCw size={12} className={loading ? 'spinning' : ''} /> {t('tech_feed.refresh')}
         </button>
       </div>
       
       <div className="feed-list">
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
-            Loading feed...
+            {t('tech_feed.loading')}
           </div>
         ) : activeTab === 'hn' ? (
           stories.map(story => (
@@ -88,7 +90,7 @@ export default function TechFeed() {
               </a>
               <div className="feed-meta">
                 <span>{story.score} pts</span>
-                <span>by {story.by} • {getRelativeTime(story.time)}</span>
+                <span>by {story.by} • {getRelativeTime(story.time, i18n.language)}</span>
                 <a href={`https://news.ycombinator.com/item?id=${story.id}`} target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', color: 'inherit' }}>
                   <ExternalLink size={12} />
                 </a>

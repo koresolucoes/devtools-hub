@@ -1,6 +1,8 @@
 import { Terminal, Database, Server, GitBranch } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function SnippetsSidebar({ onSnippetClick }) {
+  const { t } = useTranslation();
   const snippets = [
     {
       category: 'Docker & Infra',
@@ -32,7 +34,7 @@ export default function SnippetsSidebar({ onSnippetClick }) {
     <aside className="snippets-sidebar">
       <div style={{ marginBottom: '2rem' }}>
         <h3 style={{ fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-          <Terminal size={18} /> Quick Snippets
+          <Terminal size={18} /> {t('snippets.title')}
         </h3>
         
         {snippets.map((group, idx) => (

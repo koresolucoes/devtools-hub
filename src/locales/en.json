@@ -1,0 +1,51 @@
+{
+  "layout": {
+    "back_to_hub": "Back to Hub"
+  },
+  "hub": {
+    "title": "Core Utilities & Architecture Sandbox",
+    "subtitle": "Zero-BS utilities, live data feeds, and technical references for modern software engineering.",
+    "tools": {
+      "npm_verify": {
+        "name": "OSV Dependency Scanner",
+        "description": "Supply chain vulnerability analysis for the Node.js ecosystem (OSV API)."
+      },
+      "rag_sandbox": {
+        "name": "RAG Chunking Sandbox",
+        "description": "Paste your texts and visualize how chunking strategies break your documents for Vector DBs."
+      },
+      "token_estimator": {
+        "name": "Token Estimator & Pricing",
+        "description": "Validate huge System Prompts and count tokens across different models instantly."
+      },
+      "cicd_builder": {
+        "name": "Pipeline Configurator",
+        "description": "Generate production-ready YAML pipeline configs for GitHub Actions or GitLab CI."
+      },
+      "mcp_inspector": {
+        "name": "MCP Inspector",
+        "description": "Connect, debug and test your local Model Context Protocol server tools and resources."
+      }
+    },
+    "actions": {
+      "start": "Launch Tool",
+      "coming_soon": "Coming Soon"
+    },
+    "alert": {
+      "title": "URGENT: \"ChainDrop\" NPM Supply Chain Attack",
+      "text": "A massive self-propagating worm has compromised over 440 npm packages, including the popular <strong>keyv</strong> library. The malware uses preinstall hooks to exfiltrate credentials (npm, GitHub, AWS). Use our Dependency Scanner immediately to verify your local environments.",
+      "button": "Scan Your package.json Now"
+    }
+  },
+  "tech_feed": {
+    "trending_hn": "HN Top",
+    "trending_gh": "GH Trending",
+    "updated": "Updated",
+    "refresh": "Refresh",
+    "loading": "Loading feed..."
+  },
+  "snippets": {
+    "title": "Quick Snippets",
+    "copy": "Copy code"
+  }
+}
