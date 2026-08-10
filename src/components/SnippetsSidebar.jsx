@@ -1,32 +1,29 @@
 import { Terminal, Database, Server, GitBranch } from 'lucide-react';
 
-export default function SnippetsSidebar() {
+export default function SnippetsSidebar({ onSnippetClick }) {
   const snippets = [
     {
       category: 'Docker & Infra',
       icon: <Server size={14} />,
       items: [
-        { title: 'Node 20 Multi-stage', link: '#' },
-        { title: 'Nginx Reverse Proxy', link: '#' },
-        { title: 'PostgreSQL init.sql', link: '#' }
+        { title: 'Node 20 Multi-stage', id: 'node-multi-stage' },
+        { title: 'Nginx Reverse Proxy', id: 'nginx-proxy' }
       ]
     },
     {
       category: 'Git Hardcore',
       icon: <GitBranch size={14} />,
       items: [
-        { title: 'Interactive Rebase', link: '#' },
-        { title: 'Recover from Reflog', link: '#' },
-        { title: 'Squash Commits', link: '#' }
+        { title: 'Interactive Rebase', id: 'interactive-rebase' },
+        { title: 'Recover from Reflog', id: 'recover-reflog' }
       ]
     },
     {
       category: 'AI & MCP Configs',
       icon: <Database size={14} />,
       items: [
-        { title: 'Python MCP Server', link: '#' },
-        { title: 'Node MCP Client', link: '#' },
-        { title: 'FAISS Vector Store', link: '#' }
+        { title: 'Python MCP Server', id: 'mcp-python' },
+        { title: 'Node MCP Client', id: 'mcp-node' }
       ]
     }
   ];
@@ -43,10 +40,15 @@ export default function SnippetsSidebar() {
             <h4>{group.category}</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
               {group.items.map((item, iIdx) => (
-                <a key={iIdx} href={item.link} className="snippet-link">
+                <button 
+                  key={iIdx} 
+                  className="snippet-link"
+                  style={{ background: 'transparent', border: 'none', cursor: 'pointer', textAlign: 'left', width: '100%' }}
+                  onClick={() => onSnippetClick(item.id)}
+                >
                   {group.icon}
                   {item.title}
-                </a>
+                </button>
               ))}
             </div>
           </div>

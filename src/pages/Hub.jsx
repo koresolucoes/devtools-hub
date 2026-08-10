@@ -1,12 +1,15 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShieldAlert, ArrowRight, Plug, BrainCircuit, Baseline, Flag } from 'lucide-react';
 import { motion } from 'framer-motion';
 import AdBanner from '../components/AdBanner';
 import SnippetsSidebar from '../components/SnippetsSidebar';
 import TechFeed from '../components/TechFeed';
+import SnippetModal from '../components/SnippetModal';
 import '../index.css';
 
 function Hub() {
+  const [activeSnippet, setActiveSnippet] = useState(null);
   const tools = [
     {
       id: 'npm-verify',
@@ -64,7 +67,7 @@ function Hub() {
       <div className="dashboard-layout">
         
         {/* Left Column: Snippets */}
-        <SnippetsSidebar />
+        <SnippetsSidebar onSnippetClick={setActiveSnippet} />
 
         {/* Center Column: Core Tools */}
         <div className="tools-grid">
@@ -94,6 +97,11 @@ function Hub() {
         <TechFeed />
 
       </div>
+
+      <SnippetModal 
+        snippetId={activeSnippet} 
+        onClose={() => setActiveSnippet(null)} 
+      />
     </div>
   );
 }
