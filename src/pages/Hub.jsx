@@ -59,7 +59,7 @@ function Hub() {
   return (
     <div className="hub-container">
       
-      <header className="hub-header" style={{ textAlign: 'center', marginBottom: '3rem', paddingTop: '2rem' }}>
+      <header className="hub-header">
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', letterSpacing: '-0.02em' }}>
           {t('hub.title')}
         </h1>

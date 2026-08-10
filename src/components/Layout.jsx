@@ -14,14 +14,14 @@ function Layout() {
   };
 
   return (
-    <div className="app-container">
+    <div className="layout">
       <nav className="navbar">
-        <Link to="/" className="nav-logo">
+        <Link to="/" className="logo">
           <Wrench size={24} style={{ color: 'var(--accent-color)' }} />
           DevTools Hub
         </Link>
         
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <button 
             onClick={toggleLanguage}
             className="button outline"
@@ -32,8 +32,8 @@ function Layout() {
           </button>
           
           {!isHub && (
-            <Link to="/" className="nav-link">
-              <Home size={18} />
+            <Link to="/">
+              <Home size={18} style={{ display: 'inline', marginRight: '0.25rem', verticalAlign: 'text-bottom' }} />
               {t('layout.back_to_hub', 'Back to Hub')}
             </Link>
           )}
