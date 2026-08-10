@@ -673,3 +673,126 @@ p {
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+/* Dashboard 3-Column Layout */
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 260px 1fr 320px;
+  gap: 2rem;
+  align-items: start;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 1200px) {
+  .dashboard-layout {
+    grid-template-columns: 240px 1fr;
+  }
+  .tech-feed-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+  .snippets-sidebar {
+    display: none;
+  }
+}
+
+/* Snippets Sidebar */
+.snippets-sidebar {
+  position: sticky;
+  top: 80px;
+}
+
+.snippet-group {
+  margin-bottom: 1.5rem;
+}
+
+.snippet-group h4 {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid var(--surface-border);
+  padding-bottom: 0.25rem;
+}
+
+.snippet-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.875rem;
+  border-radius: var(--radius-md);
+  transition: background 0.2s;
+}
+
+.snippet-link:hover {
+  background: var(--surface-bg);
+}
+
+.snippet-link svg {
+  color: var(--text-secondary);
+}
+
+/* Tech Feed Sidebar */
+.tech-feed-sidebar {
+  position: sticky;
+  top: 80px;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.feed-header h3 {
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feed-item {
+  padding: 1rem;
+  border-bottom: 1px solid var(--surface-border);
+  transition: background 0.2s;
+}
+
+.feed-item:last-child {
+  border-bottom: none;
+}
+
+.feed-item:hover {
+  background: var(--surface-hover);
+}
+
+.feed-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.feed-title:hover {
+  color: var(--accent-color);
+}
+
+.feed-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  gap: 1rem;
+}
