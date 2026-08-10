@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Rss, ExternalLink, Flame, GitBranch, RefreshCw } from 'lucide-react';
+import { ExternalLink, Flame, GitBranch, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 function getRelativeTime(timestamp, language = 'en') {
@@ -54,8 +54,18 @@ export default function TechFeed() {
   }, [activeTab]);
 
   return (
-    <aside className="tech-feed-sidebar card" style={{ padding: 0 }}>
-      <div className="feed-tabs" style={{ display: 'flex', borderBottom: '1px solid var(--surface-border)' }}>
+    <div className="tech-feed-section" style={{ marginTop: '4rem' }}>
+      <div className="section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1px solid var(--surface-border)', paddingBottom: '0.75rem' }}>
+        <h2 style={{ fontSize: '1.25rem', margin: 0 }}>AI & DEV BRIEFING</h2>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+          <span>{t('tech_feed.updated')} {new Date(lastUpdated).toLocaleTimeString()}</span>
+          <button onClick={fetchData} disabled={loading} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+            <RefreshCw size={12} className={loading ? 'spinning' : ''} /> {t('tech_feed.refresh')}
+          </button>
+        </div>
+      </div>
+
+      <div className="feed-tabs" style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
         <button 
           onClick={() => setActiveTab('hn')}
           style={{ flex: 1, padding: '1rem', background: 'transparent', border: 'none', borderBottom: activeTab === 'hn' ? '2px solid var(--accent-color)' : '2px solid transparent', color: activeTab === 'hn' ? 'var(--text-primary)' : 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontWeight: 500 }}
@@ -69,51 +79,44 @@ export default function TechFeed() {
           <GitBranch size={16} /> {t('tech_feed.trending_gh')}
         </button>
       </div>
-
-      <div className="feed-actions" style={{ padding: '0.5rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--surface-bg)', borderBottom: '1px solid var(--surface-border)', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-        <span>{t('tech_feed.updated')} {new Date(lastUpdated).toLocaleTimeString()}</span>
-        <button onClick={fetchData} disabled={loading} style={{ background: 'transparent', border: 'none', color: 'inherit', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <RefreshCw size={12} className={loading ? 'spinning' : ''} /> {t('tech_feed.refresh')}
-        </button>
-      </div>
       
-      <div className="feed-list">
+      <div className="dev-briefing-grid">
         {loading ? (
           <div style={{ padding: '2rem', textAlign: 'center', color: 'var(--text-secondary)' }}>
             {t('tech_feed.loading')}
           </div>
         ) : activeTab === 'hn' ? (
           stories.map(story => (
-            <div key={story.id} className="feed-item">
+            <div key={story.id} className="feed-item card">
               <a href={story.url || `https://news.ycombinator.com/item?id=${story.id}`} target="_blank" rel="noreferrer" className="feed-title">
                 {story.title}
               </a>
-              <div className="feed-meta">
+              <div className="feed-meta" style={{ marginTop: '0.5rem', display: 'flex', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                 <span>{story.score} pts</span>
-                <span>by {story.by} • {getRelativeTime(story.time, i18n.language)}</span>
+                <span style={{ marginLeft: '1rem' }}>by {story.by} • {getRelativeTime(story.time, i18n.language)}</span>
                 <a href={`https://news.ycombinator.com/item?id=${story.id}`} target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', color: 'inherit' }}>
-                  <ExternalLink size={12} />
+                  <ExternalLink size={14} />
                 </a>
               </div>
             </div>
           ))
         ) : (
           repos.map(repo => (
-            <div key={repo.id} className="feed-item">
+            <div key={repo.id} className="feed-item card">
               <a href={repo.html_url} target="_blank" rel="noreferrer" className="feed-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <GitBranch size={14} /> {repo.full_name}
               </a>
-              <div className="feed-meta">
+              <div className="feed-meta" style={{ marginTop: '0.5rem', display: 'flex', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                 <span style={{ color: 'var(--accent-color)' }}>★ {repo.stargazers_count.toLocaleString()}</span>
-                <span>{repo.language || 'Markdown'}</span>
+                <span style={{ marginLeft: '1rem' }}>{repo.language || 'Markdown'}</span>
                 <a href={repo.html_url} target="_blank" rel="noreferrer" style={{ marginLeft: 'auto', color: 'inherit' }}>
-                  <ExternalLink size={12} />
+                  <ExternalLink size={14} />
                 </a>
               </div>
             </div>
           ))
         )}
       </div>
-    </aside>
+    </div>
   );
 }
