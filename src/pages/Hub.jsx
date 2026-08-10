@@ -70,7 +70,34 @@ function Hub() {
         <SnippetsSidebar onSnippetClick={setActiveSnippet} />
 
         {/* Center Column: Core Tools */}
-        <div className="tools-grid">
+        <div className="tools-container" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+          
+          {/* Security Alert Banner */}
+          <div className="card" style={{ 
+            background: 'linear-gradient(to right, rgba(239, 68, 68, 0.1), transparent)', 
+            border: '1px solid var(--danger)',
+            padding: '1.5rem',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '4px', height: '100%', background: 'var(--danger)' }}></div>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1rem' }}>
+              <ShieldAlert size={24} style={{ color: 'var(--danger)', flexShrink: 0, marginTop: '2px' }} />
+              <div>
+                <h3 style={{ color: 'var(--danger)', marginBottom: '0.5rem', fontSize: '1.1rem' }}>URGENT: "ChainDrop" NPM Supply Chain Attack</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem', lineHeight: '1.5' }}>
+                  A massive self-propagating worm has compromised over 440 npm packages, including the popular <strong>keyv</strong> library. 
+                  The malware uses preinstall hooks to exfiltrate credentials (npm, GitHub, AWS). Use our Dependency Scanner immediately to verify your local environments.
+                </p>
+                <Link to="/npm-verify" className="button" style={{ background: 'var(--danger)', color: 'white', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                  Scan Your package.json Now <ArrowRight size={16} />
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Tools Grid */}
+          <div className="tools-grid">
           {tools.map(tool => (
             <div key={tool.id} className={`tool-card card ${tool.status}`}>
               <div className="tool-card-icon">
@@ -91,6 +118,7 @@ function Hub() {
               )}
             </div>
           ))}
+        </div>
         </div>
 
         {/* Right Column: HackerNews Feed */}
