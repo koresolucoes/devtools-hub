@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ShieldAlert, AlertTriangle, Info, ArrowRight, Code, Check } from 'lucide-react';
 import styles from './FindingsList.module.css';
 
-const SeverityBadge = ({ severity }) => {
+const SeverityBadge = ({ severity = 'unknown' }) => {
   let colorClass = styles.severityLow;
   let Icon = Info;
   
@@ -38,7 +38,7 @@ Please fix the following issue in my repository.
 
 [ISSUE DETAILS]
 - Finding: ${finding.title}
-- Category: ${finding.category}
+- Category: ${finding.category || 'general'}
 - Impact: ${finding.impact || 'N/A'}
 
 [EVIDENCE]
@@ -84,7 +84,7 @@ ${remediationText}
           <SeverityBadge severity={finding.severity} />
           <h4 className={styles.findingTitle}>{finding.title}</h4>
         </div>
-        <span className={styles.findingCategory}>{finding.category.toUpperCase()}</span>
+        <span className={styles.findingCategory}>{(finding.category || 'general').toUpperCase()}</span>
       </div>
       
       <p className={styles.findingDescription}>{finding.description}</p>
