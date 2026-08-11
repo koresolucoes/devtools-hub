@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, ShieldAlert, ShieldCheck, Activity, CheckCircle, AlertTriangle, AlertCircle, HelpCircle } from 'lucide-react';
+import { CheckCircle, AlertTriangle, AlertCircle, HelpCircle } from 'lucide-react';
 import styles from './HealthDashboard.module.css';
 
 const HealthGauge = ({ score, confidence }) => {
@@ -60,7 +60,7 @@ const CategoryScore = ({ name, result }) => {
   );
 };
 
-export default function HealthDashboard({ health, project }) {
+export default function HealthDashboard({ health }) {
   let shipColor = 'var(--success)';
   let ShipIcon = CheckCircle;
   let shipText = 'Ready to Ship';
@@ -79,13 +79,13 @@ export default function HealthDashboard({ health, project }) {
     <div className={styles.dashboard}>
       <div className={styles.mainScore}>
         <h3>Project Health</h3>
-        <HealthGauge score={health.score} confidence={health.confidence} />
+        <HealthGauge score={health.score} confidence={health.analysisConfidence} />
         <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: shipColor, fontWeight: 'bold' }}>
           <ShipIcon size={20} />
           {shipText}
         </div>
         <p className={styles.scoreDescription}>
-          Based on architecture, dependencies, security, and quality rules. Analysis coverage: {health.coverage}%.
+          Based on architecture, dependencies, security, and quality rules. Analysis coverage: {health.coverage?.checkCoverage ?? 100}%.
         </p>
       </div>
 

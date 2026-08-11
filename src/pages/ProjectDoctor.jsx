@@ -151,7 +151,7 @@ export default function ProjectDoctor() {
               </div>
               <div className={styles.summaryItem}>
                 <span className={styles.summaryLabel}>Coverage</span>
-                <span className={styles.summaryValue}>{result.health.coverage}%</span>
+                <span className={styles.summaryValue}>{result.health.coverage?.checkCoverage ?? 100}%</span>
               </div>
             </div>
 
