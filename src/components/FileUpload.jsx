@@ -22,9 +22,9 @@ export default function FileUpload({ onFileUpload }) {
     setError(null);
     if (!file) return;
     
-    // Accept JSON, YAML, TOML, TXT
-    if (!file.name.match(/\.(json|yaml|yml|toml|txt)$/) && file.name !== 'Pipfile') {
-      setError('Por favor, selecione um arquivo suportado (package.json, lockfiles, requirements.txt, etc).');
+    // Accept package.json, requirements.txt
+    if (file.name !== 'package.json' && file.name !== 'requirements.txt') {
+      setError('Por favor, selecione um arquivo suportado (package.json ou requirements.txt).');
       return;
     }
 
@@ -132,7 +132,7 @@ export default function FileUpload({ onFileUpload }) {
         <input 
           ref={inputRef}
           type="file"
-          accept=".json"
+          accept=".json,.txt"
           onChange={handleChange}
           style={{ display: 'none' }}
         />

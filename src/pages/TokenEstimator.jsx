@@ -9,7 +9,8 @@ import '../index.css';
 function TokenEstimator() {
   const toolData = tools.find(t => t.slug === 'token-estimator');
   const [prompt, setPrompt] = useState('');
-  const [tokenCount, setTokenCount] = useState(0);
+  const [tokenCount, setTokenCount] = useState(0); // Exact OpenAI
+  const [estimatedTokens, setEstimatedTokens] = useState(0); // Char / 4
   const [charCount, setCharCount] = useState(0);
 
   const [selectedModel, setSelectedModel] = useState('gpt4o');
@@ -18,12 +19,14 @@ function TokenEstimator() {
 
   useEffect(() => {
     setCharCount(prompt.length);
-    // Encode the text into tokens
+    setEstimatedTokens(Math.ceil(prompt.length / 4));
+    // Encode the text into tokens using OpenAI tokenizer
     const tokens = encode(prompt);
     setTokenCount(tokens.length);
   }, [prompt]);
 
-  const estimatedCost = ((tokenCount / 1000000) * PRICE_PER_1M_TOKENS).toFixed(5);
+  const displayTokenCount = activeModel.provider === 'OpenAI' ? tokenCount : estimatedTokens;
+  const estimatedCost = ((displayTokenCount / 1000000) * PRICE_PER_1M_TOKENS).toFixed(5);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -56,8 +59,8 @@ function TokenEstimator() {
           <div className="stat-box">
             <Cpu size={24} />
             <div>
-              <h4>Total Tokens</h4>
-              <span className="stat-value">{tokenCount.toLocaleString()}</span>
+              <h4>{activeModel.provider === 'OpenAI' ? 'Exact Tokens' : 'Estimated Tokens (~4 chars)'}</h4>
+              <span className="stat-value">{displayTokenCount.toLocaleString()}</span>
             </div>
           </div>
           

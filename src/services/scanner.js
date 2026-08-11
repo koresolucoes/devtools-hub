@@ -1,56 +1,15 @@
+import { DEPENDENCY_PARSERS } from '../core/dependencies/index';
+
 // OSV API endpoint
 const OSV_API_URL = 'https://api.osv.dev/v1/querybatch';
 
 export function extractDependencies(textContent, fileName = 'package.json') {
-  const deps = [];
-  
-  let ecosystem = 'npm';
-  if (fileName.includes('requirements.txt') || fileName.includes('pyproject.toml') || fileName.includes('Pipfile')) {
-    ecosystem = 'PyPI';
-  } else if (fileName.includes('composer.json') || fileName.includes('composer.lock')) {
-    ecosystem = 'Packagist';
-  } else if (fileName.includes('Gemfile')) {
-    ecosystem = 'RubyGems';
+  const parser = DEPENDENCY_PARSERS[fileName];
+  if (!parser) {
+    console.error(`No parser found for ${fileName}`);
+    return [];
   }
-
-  if (fileName.endsWith('.json')) {
-    try {
-      const jsonContent = JSON.parse(textContent);
-      const rawDeps = {};
-      if (jsonContent.dependencies) Object.assign(rawDeps, jsonContent.dependencies);
-      if (jsonContent.devDependencies) Object.assign(rawDeps, jsonContent.devDependencies);
-      
-      if (jsonContent.packages) {
-        for (const [path, pkg] of Object.entries(jsonContent.packages)) {
-          if (path && pkg.name && pkg.version) rawDeps[pkg.name] = pkg.version;
-        }
-      } else if (jsonContent.dependencies && jsonContent.lockfileVersion) {
-        for (const [name, pkg] of Object.entries(jsonContent.dependencies)) {
-          rawDeps[name] = pkg.version;
-        }
-      }
-
-      for (const [name, version] of Object.entries(rawDeps)) {
-        const cleanMatch = version.match(/(\d+\.\d+\.\d+)/);
-        const cleanVersion = cleanMatch ? cleanMatch[1] : version.replace(/[\^~>=<]/g, '').trim();
-        if (name && cleanVersion) deps.push({ name, version: cleanVersion, ecosystem });
-      }
-    } catch(e) {
-      console.error('Invalid JSON', e);
-    }
-  } else if (fileName.includes('requirements.txt')) {
-    const lines = textContent.split('\n');
-    for (const line of lines) {
-      const cleanLine = line.split('#')[0].trim();
-      if (!cleanLine) continue;
-      const match = cleanLine.match(/^([a-zA-Z0-9_\-]+).*?([0-9\.]+)$/);
-      if (match) {
-        deps.push({ name: match[1], version: match[2], ecosystem });
-      }
-    }
-  }
-
-  return deps;
+  return parser.parse(textContent);
 }
 
 /**
@@ -140,11 +99,6 @@ function formatVulnerabilities(rawResults) {
         const sev = vuln.database_specific.severity.toUpperCase();
         if (severityScores[sev] > severityScores[maxSeverity]) {
           maxSeverity = sev;
-        }
-      } else {
-        // Keeps UNKNOWN if no specific severity found
-        if (severityScores['UNKNOWN'] > severityScores[maxSeverity]) {
-          maxSeverity = 'UNKNOWN';
         }
       }
     });

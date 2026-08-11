@@ -24,16 +24,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { PIPELINE_PRESETS } from '../data/presets';
-import { 
-  buildPipelineIR, 
-  compileToGitHubYAML, 
-  compileToGitLabYAML, 
-  calculateHealthScore, 
-  generateSecretChecklist, 
-  generateDotEnvExample,
-  explainPipeline,
-  validatePipeline
-} from '../utils/pipelineIR';
+import { buildPipelineIR, compileToGitHubYAML, compileToGitLabYAML, calculateHealthScore, generateSecretChecklist, generateDotEnvExample, explainPipeline, validatePipeline } from "../core/pipeline/index";
 import { tools } from '../data/contentModel';
 import { Link } from 'react-router-dom';
 import '../index.css';
