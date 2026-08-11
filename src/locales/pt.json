@@ -59,5 +59,69 @@
   "snippets": {
     "title": "Quick Snippets",
     "copy": "Copiar código"
+  },
+  "templates_index": {
+    "title": "Templates de Arquitetura",
+    "subtitle": "Não comece de um arquivo em branco. Blueprints prontos para produção para CI/CD, infraestrutura e deploy.",
+    "search": "Buscar templates...",
+    "category_all": "Todos",
+    "category_cicd": "CI/CD",
+    "category_docker": "Docker",
+    "category_deploy": "Deploy",
+    "view": "Ver",
+    "customize": "Personalizar no Pipeline Architect",
+    "browse_stack": "Navegar por stack"
+  },
+  "templates": {
+    "status": {
+      "production": "PRODUÇÃO",
+      "starter": "INICIAL"
+    },
+    "tag": {
+      "popular": "POPULAR",
+      "new": "NOVO"
+    },
+    "github-actions-nextjs-vercel": {
+      "title": "Next.js → Vercel",
+      "summary": "Pipeline de CI/CD pronto para produção para aplicações Next.js com caching, linting, testes e deploy na Vercel.",
+      "category": "CI/CD",
+      "features": ["Testes", "Cache", "Deploy de Produção"],
+      "flow": ["PR", "Test", "Build", "Vercel"]
+    },
+    "github-actions-node-docker": {
+      "title": "Node.js → Docker",
+      "summary": "Faça build, teste e publique uma imagem Docker de produção.",
+      "category": "CI/CD",
+      "features": ["Buildx", "Cache de camadas", "Tags por SHA"],
+      "flow": ["Test", "Build", "Push", "GHCR"]
+    },
+    "github-actions-python-docker": {
+      "title": "Python → Docker",
+      "summary": "Construa, teste e coloque aplicações Python em containers de forma eficiente.",
+      "category": "CI/CD",
+      "features": ["pytest", "Cache Poetry", "Build Multi-stage"],
+      "flow": ["Lint", "Test", "Build", "Push"]
+    },
+    "github-actions-fastapi-docker": {
+      "title": "FastAPI → Docker",
+      "summary": "Pipeline de build Docker otimizado para backends FastAPI.",
+      "category": "Docker",
+      "features": ["Uvicorn", "Imagem slim", "Scan de segurança"],
+      "flow": ["Test", "Build", "Push", "Deploy"]
+    },
+    "github-actions-node-ghcr": {
+      "title": "Node.js → GHCR",
+      "summary": "Faça push de serviços Node.js diretamente para o GitHub Container Registry.",
+      "category": "Deploy",
+      "features": ["Tags automáticas", "Auth no Registry", "Multi-arch"],
+      "flow": ["Build", "Tag", "Push", "GHCR"]
+    },
+    "github-actions-nextjs-docker": {
+      "title": "Next.js → Docker",
+      "summary": "Pipeline de build Docker Next.js standalone para hospedagem customizada.",
+      "category": "Docker",
+      "features": ["Output standalone", "Imagem Alpine", "Env vars"],
+      "flow": ["Build", "Standalone", "Push", "Deploy"]
+    }
   }
 }
