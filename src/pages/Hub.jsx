@@ -168,7 +168,7 @@ function Hub() {
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {guides.slice(0, 3).map(g => (
-                <Link to={`/guides/${g.slug}`} key={g.slug} className="card p-4" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link to={`/guides/${g.slug}`} key={g.slug} className="card" style={{ padding: '1rem', borderRadius: '8px', textDecoration: 'none', color: 'inherit' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{g.category}</div>
                   <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{g.title}</h3>
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{g.summary}</p>
@@ -182,7 +182,7 @@ function Hub() {
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {templates.slice(0, 3).map(t => (
-                <Link to={`/templates/${t.slug}`} key={t.slug} className="card p-4" style={{ textDecoration: 'none', color: 'inherit' }}>
+                <Link to={`/templates/${t.slug}`} key={t.slug} className="card" style={{ padding: '1rem', borderRadius: '8px', textDecoration: 'none', color: 'inherit' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{t.category}</div>
                   <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{t.title}</h3>
                   <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.summary}</p>

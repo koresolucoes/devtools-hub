@@ -133,18 +133,70 @@ export const guides = [
 export const templates = [
   {
     slug: 'github-actions-nextjs-vercel',
-    title: 'Next.js + Vercel (GitHub Actions)',
-    summary: 'A complete pipeline to build, test, and deploy Next.js apps to Vercel.',
-    stack: ['Next.js', 'Vercel', 'GitHub Actions'],
+    title: 'Next.js → Vercel',
+    summary: 'Production-ready CI/CD pipeline for Next.js applications with caching, linting, tests and Vercel deployment.',
+    stack: ['Next.js', 'pnpm', 'Vercel'],
     category: 'CI/CD',
+    status: 'PRODUCTION',
+    tag: 'POPULAR',
+    flow: ['PR', 'Test', 'Build', 'Vercel'],
+    features: ['Tests', 'Cache', 'Production deploy'],
     relatedTools: ['pipeline-architect']
   },
   {
     slug: 'github-actions-node-docker',
-    title: 'Node.js + Docker (GitHub Actions)',
-    summary: 'Build and push a Docker image for your Node.js application.',
-    stack: ['Node.js', 'Docker', 'GitHub Actions'],
+    title: 'Node.js → Docker',
+    summary: 'Build, test and publish a production Docker image.',
+    stack: ['Node.js', 'Docker', 'GHCR'],
     category: 'CI/CD',
+    status: 'PRODUCTION',
+    flow: ['Test', 'Build', 'Push', 'GHCR'],
+    features: ['Buildx', 'Layer cache', 'SHA tags'],
+    relatedTools: ['pipeline-architect']
+  },
+  {
+    slug: 'github-actions-python-docker',
+    title: 'Python → Docker',
+    summary: 'Build, test and containerize Python applications efficiently.',
+    stack: ['Python', 'Docker', 'GHCR'],
+    category: 'CI/CD',
+    status: 'PRODUCTION',
+    tag: 'NEW',
+    flow: ['Lint', 'Test', 'Build', 'Push'],
+    features: ['pytest', 'Poetry caching', 'Multi-stage build'],
+    relatedTools: ['pipeline-architect']
+  },
+  {
+    slug: 'github-actions-fastapi-docker',
+    title: 'FastAPI → Docker',
+    summary: 'Optimized Docker build pipeline for FastAPI backends.',
+    stack: ['FastAPI', 'Python', 'Docker'],
+    category: 'Docker',
+    status: 'PRODUCTION',
+    flow: ['Test', 'Build', 'Push', 'Deploy'],
+    features: ['Uvicorn', 'Slim image', 'Security scan'],
+    relatedTools: ['pipeline-architect']
+  },
+  {
+    slug: 'github-actions-node-ghcr',
+    title: 'Node.js → GHCR',
+    summary: 'Push Node.js services directly to GitHub Container Registry.',
+    stack: ['Node.js', 'Docker', 'GHCR'],
+    category: 'Deploy',
+    status: 'STARTER',
+    flow: ['Build', 'Tag', 'Push', 'GHCR'],
+    features: ['Automated tags', 'Registry auth', 'Multi-arch'],
+    relatedTools: ['pipeline-architect']
+  },
+  {
+    slug: 'github-actions-nextjs-docker',
+    title: 'Next.js → Docker',
+    summary: 'Standalone Next.js Docker build pipeline for custom hosting.',
+    stack: ['Next.js', 'Docker', 'Actions'],
+    category: 'Docker',
+    status: 'PRODUCTION',
+    flow: ['Build', 'Standalone', 'Push', 'Deploy'],
+    features: ['Output standalone', 'Alpine image', 'Env vars'],
     relatedTools: ['pipeline-architect']
   }
 ];

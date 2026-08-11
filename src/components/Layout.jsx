@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, Terminal, Search, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import CookieBanner from './CookieBanner';
 import '../index.css';
 
 function Layout() {
@@ -26,9 +27,9 @@ function Layout() {
           
           <div className="nav-links" style={{ display: 'none' }}>
             {/* These are just visual anchors for the homepage or router links */}
-            <Link to="/">Tools</Link>
-            <Link to="/">Snippets</Link>
-            <Link to="/">Briefing</Link>
+            <Link to="/">{t('layout.nav.tools', 'Tools')}</Link>
+            <Link to="/templates">{t('layout.nav.templates', 'Templates')}</Link>
+            <Link to="/briefing">{t('layout.nav.briefing', 'Briefing')}</Link>
           </div>
           {/* Unhide nav-links on desktop */}
           <style>{`@media(min-width: 768px) { .nav-links { display: flex !important; } }`}</style>
@@ -110,15 +111,19 @@ function Layout() {
             </div>
           </div>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '2rem', borderTop: '1px solid var(--surface-border)', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
-            <span>© {new Date().getFullYear()} DevsHub. {t('layout.footer.rights', 'All rights reserved.')}</span>
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>{t('layout.footer.privacy', 'Privacy Policy')}</Link>
-              <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>{t('layout.footer.terms', 'Terms of Service')}</Link>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '2rem', borderTop: '1px solid var(--surface-border)', color: 'var(--text-secondary)', fontSize: '0.8rem', flexWrap: 'wrap', gap: '1rem' }}>
+            <span>© 2026 DevsHub · Kore Serviços de Tecnologia</span>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>{t('layout.footer.terms', 'Terms')}</Link>
+              <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>{t('layout.footer.privacy', 'Privacy')}</Link>
+              <Link to="/cookies" style={{ color: 'inherit', textDecoration: 'none' }}>{t('layout.footer.cookies', 'Cookies')}</Link>
+              <Link to="/legal" style={{ color: 'inherit', textDecoration: 'none' }}>{t('layout.footer.legal', 'Legal')}</Link>
+              <span>CNPJ 63.135.423/0001-39</span>
             </div>
           </div>
         </div>
       </footer>
+      <CookieBanner />
     </div>
   );
 }

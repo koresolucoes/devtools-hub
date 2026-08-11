@@ -11,6 +11,8 @@ import BriefingDetail from './pages/BriefingDetail';
 import GuidesIndex from './pages/GuidesIndex';
 import TemplatesIndex from './pages/TemplatesIndex';
 import BriefingIndex from './pages/BriefingIndex';
+import Cookies from './pages/Cookies';
+import Legal from './pages/Legal';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 import './index.css';
@@ -41,6 +43,8 @@ function App() {
           {/* Legal Routes */}
           <Route path="privacy" element={<Privacy />} />
           <Route path="terms" element={<Terms />} />
+          <Route path="cookies" element={<Cookies />} />
+          <Route path="legal" element={<Legal />} />
 
           {/* Legacy redirects */}
           <Route path="npm-verify" element={<Navigate to="/tools/osv-dependency-scanner" replace />} />

@@ -19,7 +19,7 @@ export default function TemplatesIndex() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {templates.map(tmp => (
-          <Link to={`/templates/${tmp.slug}`} key={tmp.slug} className="card p-6" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to={`/templates/${tmp.slug}`} key={tmp.slug} className="card" style={{ padding: '1.5rem', borderRadius: '8px', textDecoration: 'none', color: 'inherit' }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               {tmp.category}
             </div>

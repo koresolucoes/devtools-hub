@@ -19,7 +19,7 @@ export default function GuidesIndex() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {guides.map(g => (
-          <Link to={`/guides/${g.slug}`} key={g.slug} className="card p-6" style={{ textDecoration: 'none', color: 'inherit' }}>
+          <Link to={`/guides/${g.slug}`} key={g.slug} className="card" style={{ padding: '1.5rem', borderRadius: '8px', textDecoration: 'none', color: 'inherit' }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
               {g.category}
             </div>

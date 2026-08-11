@@ -90,7 +90,7 @@ export default function TechFeed() {
           <span>{latestBrief?.date?.toUpperCase()}</span>
         </div>
         
-        <div className="card p-6" style={{ border: '1px solid var(--surface-border)', background: 'var(--surface-bg)' }}>
+        <div className="card" style={{ padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--surface-border)', background: 'var(--surface-bg)' }}>
           <h3 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
             {t('tech_feed.developer_intelligence', 'Developer Intelligence')} — {latestBrief?.date}
           </h3>
