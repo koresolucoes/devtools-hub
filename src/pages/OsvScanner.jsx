@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import FileUpload from '../components/FileUpload';
 import VulnerabilityReport from '../components/VulnerabilityReport';
-import { extractDependencies, scanDependencies } from '../services/scanner';
+import { scanDependencies } from '../core/security/osvClient';
+import { packageJsonParser } from '../core/dependencies/packageJson';
+import { packageLockParser } from '../core/dependencies/packageLock';
+import { requirementsTxtParser } from '../core/dependencies/requirementsTxt';
 import { ShieldAlert, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { tools } from '../data/contentModel';
@@ -19,6 +22,13 @@ function OsvScanner() {
     try {
       setAppState('scanning');
       
+      const extractDependencies = (content, fileName) => {
+        if (fileName.endsWith('package.json')) return packageJsonParser.parse(content);
+        if (fileName.endsWith('package-lock.json')) return packageLockParser.parse(content);
+        if (fileName.endsWith('requirements.txt')) return requirementsTxtParser.parse(content);
+        return [];
+      };
+
       const deps = extractDependencies(jsonContent, fileName);
       const depCount = deps.length;
       

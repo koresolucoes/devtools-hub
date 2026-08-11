@@ -13,8 +13,20 @@ export const requirementsTxtParser: DependencyParser = {
       const parts = line.split(/==|>=|<=|~=|>|</);
       if (parts.length > 0) {
         const name = parts[0].trim();
-        // Just extract the name and leave version fuzzy if not exact
-        deps.push({ name, version: '*', ecosystem: 'PyPI', direct: true, dev: false, source: 'requirements.txt' });
+        const match = line.match(/==([^;]+)/);
+        const resolvedVersion = match ? match[1].trim() : undefined;
+        
+        deps.push({ 
+          name, 
+          ecosystem: 'PyPI', 
+          declaredRange: line, 
+          resolvedVersion,
+          resolutionStatus: resolvedVersion ? 'resolved' : 'unresolved',
+          direct: true, 
+          dev: false, 
+          transitive: false,
+          source: 'requirements.txt' 
+        });
       }
     }
 

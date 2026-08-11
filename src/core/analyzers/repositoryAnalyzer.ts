@@ -17,6 +17,9 @@ import {
 import { getErrorMessage } from '../errors';
 import { packageJsonParser } from '../dependencies/packageJson';
 import { requirementsTxtParser } from '../dependencies/requirementsTxt';
+import { packageLockParser } from '../dependencies/packageLock';
+import { resolveDependencies } from '../dependencies/resolveDependencies';
+import type { Dependency } from '../project/types';
 
 const MAX_ANALYZED_FILES = 60;
 const MAX_FILE_SIZE_BYTES = 512 * 1024; // 512 KB
@@ -81,6 +84,9 @@ export async function analyzeRepository(provider: RepositoryProvider): Promise<P
 
   let totalBytes = 0;
   
+  const declaredDeps: Dependency[] = [];
+  const resolvedDeps: Dependency[] = [];
+  
   // Chunking for concurrency limits
   for (let i = 0; i < filesToFetch.length; i += MAX_CONCURRENCY) {
     const chunk = filesToFetch.slice(i, i + MAX_CONCURRENCY);
@@ -115,11 +121,13 @@ export async function analyzeRepository(provider: RepositoryProvider): Promise<P
             try {
               const pkg = JSON.parse(content);
               ir.scripts = { ...ir.scripts, ...(pkg.scripts || {}) };
-              ir.dependencies.push(...packageJsonParser.parse(content));
+              declaredDeps.push(...packageJsonParser.parse(content));
             } catch(e) {}
+          } else if (file.path.endsWith('package-lock.json')) {
+            resolvedDeps.push(...packageLockParser.parse(content));
           } else if (file.path.endsWith('requirements.txt')) {
             ir.manifests.push({ path: file.path, type: 'requirements.txt' });
-            ir.dependencies.push(...requirementsTxtParser.parse(content));
+            declaredDeps.push(...requirementsTxtParser.parse(content));
           } else if (file.path.endsWith('pyproject.toml')) {
             ir.manifests.push({ path: file.path, type: 'pyproject.toml' });
           }
@@ -131,8 +139,10 @@ export async function analyzeRepository(provider: RepositoryProvider): Promise<P
 
     if (totalBytes >= MAX_TOTAL_ANALYSIS_BYTES) break;
   }
+  
+  ir.dependencies = resolveDependencies(declaredDeps, resolvedDeps);
 
-  // Deduplicate dependencies that might have been parsed multiple times or from different workspaces (simplistic for MVP)
+  // Deduplicate dependencies that might have been parsed multiple times
   const depMap = new Map();
   for (const dep of ir.dependencies) {
     if (!depMap.has(dep.name)) {

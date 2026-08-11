@@ -32,11 +32,16 @@ export interface DetectedTechnology {
 
 export interface Dependency {
   name: string;
-  version: string;
   ecosystem: 'npm' | 'PyPI';
+  declaredRange?: string;
+  resolvedVersion?: string;
+  resolutionStatus: 'resolved' | 'unresolved';
   direct: boolean;
   dev: boolean;
+  transitive: boolean;
   source: string;
+  lockfile?: string;
+  packagePath?: string;
   evidence?: Evidence[];
 }
 

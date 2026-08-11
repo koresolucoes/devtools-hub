@@ -1,15 +1,22 @@
 import type { ProjectIR } from '../project/types';
-import type { Finding } from '../rules/types';
+import type { CheckResult } from '../checks/types';
 
 export interface HealthCategoryResult {
-  score: number;
-  status: 'scored' | 'insufficient-data';
+  score: number | null;
+  coverage: number;
+  confidence: number;
+  checksPassed: number;
+  checksFailed: number;
+  checksUnknown: number;
+  checksNotApplicable: number;
 }
 
 export interface ProjectHealth {
   score: number;
   rating: 'excellent' | 'good' | 'warning' | 'critical';
   confidence: number;
+  coverage: number;
+  shipStatus: 'ready' | 'ready-with-warnings' | 'not-ready' | 'unknown';
   categories: {
     build: HealthCategoryResult;
     security: HealthCategoryResult;
@@ -22,93 +29,88 @@ export interface ProjectHealth {
   };
 }
 
-export function calculateProjectHealth(ir: ProjectIR, findings: Finding[]): ProjectHealth {
-  // Weights (Relative)
-  const WEIGHTS = {
-    build: 15,
-    security: 20,
-    quality: 10,
-    ci: 15,
-    deployment: 10,
-    maintainability: 10,
-    architecture: 10,
-    dependencies: 10
+export function calculateProjectHealth(ir: ProjectIR, checks: CheckResult[]): ProjectHealth {
+  const categories: Record<keyof ProjectHealth['categories'], HealthCategoryResult> = {
+    build: createEmptyCategory(),
+    security: createEmptyCategory(),
+    quality: createEmptyCategory(),
+    ci: createEmptyCategory(),
+    deployment: createEmptyCategory(),
+    maintainability: createEmptyCategory(),
+    architecture: createEmptyCategory(),
+    dependencies: createEmptyCategory()
   };
 
-  const categories: Record<keyof typeof WEIGHTS, HealthCategoryResult> = {
-    build: { score: 100, status: 'scored' },
-    security: { score: 100, status: 'scored' },
-    quality: { score: 100, status: 'scored' },
-    ci: { score: 100, status: 'scored' },
-    deployment: { score: 100, status: 'scored' },
-    maintainability: { score: 100, status: 'scored' },
-    architecture: { score: 100, status: 'scored' },
-    dependencies: { score: 100, status: 'scored' }
-  };
-
-  // Determine insufficient data
-  if (!ir.manifests.length && !ir.scripts.build) categories.build.status = 'insufficient-data';
-  if (!ir.infrastructure.ci) categories.ci.status = 'insufficient-data';
-  if (!ir.infrastructure.deployments.length) categories.deployment.status = 'insufficient-data';
-  if (ir.dependencies.length === 0) {
-    categories.security.status = 'insufficient-data';
-    categories.dependencies.status = 'insufficient-data';
+  function createEmptyCategory(): HealthCategoryResult {
+    return { score: null, coverage: 0, confidence: 100, checksPassed: 0, checksFailed: 0, checksUnknown: 0, checksNotApplicable: 0 };
   }
-  if (ir.quality.tests.length === 0 && ir.quality.linters.length === 0) categories.quality.status = 'insufficient-data';
-  if (ir.frameworks.length === 0 && ir.languages.length === 0) categories.architecture.status = 'insufficient-data';
 
-  // Penalties
-  for (const finding of findings) {
-    const cat = finding.category as keyof typeof categories;
-    if (categories[cat]) {
-      let penalty = 0;
-      switch (finding.severity) {
-        case 'critical': penalty = 50; break;
-        case 'high': penalty = 30; break;
-        case 'medium': penalty = 15; break;
-        case 'low': penalty = 5; break;
-        case 'info': penalty = 0; break;
-      }
-      categories[cat].score = Math.max(0, categories[cat].score - penalty);
-      // If we got a finding, we force status to scored as we have evidence
-      categories[cat].status = 'scored';
+  // Populate checks
+  for (const check of checks) {
+    const cat = categories[check.category as keyof typeof categories];
+    if (cat) {
+      if (check.status === 'pass') cat.checksPassed++;
+      else if (check.status === 'fail') cat.checksFailed++;
+      else if (check.status === 'unknown') cat.checksUnknown++;
+      else if (check.status === 'not-applicable') cat.checksNotApplicable++;
     }
   }
 
+  // Calculate scores per category
   let totalScore = 0;
-  let totalWeight = 0;
+  let totalCategoriesScored = 0;
+  let hasConfirmedCriticalProductionVuln = false;
 
-  for (const [key, catResult] of Object.entries(categories)) {
-    const cat = key as keyof typeof WEIGHTS;
-    if (catResult.status === 'scored') {
-      totalScore += catResult.score * WEIGHTS[cat];
-      totalWeight += WEIGHTS[cat];
+  for (const [, cat] of Object.entries(categories)) {
+    const totalEvaluated = cat.checksPassed + cat.checksFailed;
+    if (totalEvaluated > 0) {
+      cat.score = Math.round((cat.checksPassed / totalEvaluated) * 100);
+      cat.coverage = Math.round((totalEvaluated / (totalEvaluated + cat.checksUnknown)) * 100);
+      totalScore += cat.score;
+      totalCategoriesScored++;
+    } else {
+      cat.score = null;
+      cat.coverage = 0;
     }
   }
 
-  // Normalize final score to 100 based on active weights
-  const finalScore = totalWeight > 0 ? (totalScore / totalWeight) : 100;
+  // Analyze checks for ship status
+  for (const check of checks) {
+    if (check.category === 'security' && check.status === 'fail' && check.finding?.severity === 'critical') {
+      // Check if it's production (direct or transitive, but not dev)
+      // Since we don't have deep context here in check finding, we can assume critical security failure affects shipStatus.
+      // A more detailed implementation would inspect check.evidence.
+      const isDevOnly = check.evidence?.every(e => e.path === 'devDependencies');
+      if (!isDevOnly) {
+        hasConfirmedCriticalProductionVuln = true;
+      }
+    }
+  }
 
-  let confidence = 100;
-  if (ir.analysis.partial) confidence -= 20;
-  if (ir.languages.length === 0) confidence -= 30;
-  if (ir.analysis.warnings.length > 0) confidence -= 10;
-  
-  // Decrease confidence based on how many categories are insufficient
-  const insufficientCount = Object.values(categories).filter(c => c.status === 'insufficient-data').length;
-  confidence -= (insufficientCount * 5);
-
-  confidence = Math.max(0, Math.min(100, confidence));
-
+  const finalScore = totalCategoriesScored > 0 ? totalScore / totalCategoriesScored : 100;
   let rating: ProjectHealth['rating'] = 'excellent';
   if (finalScore < 50) rating = 'critical';
   else if (finalScore < 75) rating = 'warning';
   else if (finalScore < 90) rating = 'good';
 
+  let confidence = 100;
+  if (ir.analysis.partial) confidence -= 20;
+  if (ir.analysis.warnings.length > 0) confidence -= (ir.analysis.warnings.length * 5);
+  confidence = Math.max(0, Math.min(100, confidence));
+
+  let shipStatus: ProjectHealth['shipStatus'] = 'ready';
+  if (hasConfirmedCriticalProductionVuln) {
+    shipStatus = 'not-ready';
+  } else if (finalScore < 75) {
+    shipStatus = 'ready-with-warnings';
+  }
+
   return {
     score: Math.round(finalScore),
     rating,
-    confidence: Math.round(confidence),
+    confidence,
+    coverage: totalCategoriesScored > 0 ? 100 : 0, // Simplified global coverage for now
+    shipStatus,
     categories
   };
 }

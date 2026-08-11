@@ -36,7 +36,7 @@ const CategoryScore = ({ name, result }) => {
   let icon = <CheckCircle size={20} color="var(--success)" />;
   let valueColor = 'var(--success)';
   
-  if (result.status === 'insufficient-data') {
+  if (result.score === null) {
     icon = <HelpCircle size={20} color="var(--text-tertiary)" />;
     valueColor = 'var(--text-tertiary)';
   } else if (result.score < 50) {
@@ -54,20 +54,38 @@ const CategoryScore = ({ name, result }) => {
         <span className={styles.categoryName}>{name}</span>
       </div>
       <div className={styles.categoryValue} style={{ color: valueColor }}>
-        {result.status === 'insufficient-data' ? 'N/A' : `${result.score}%`}
+        {result.score === null ? 'N/A' : `${result.score}%`}
       </div>
     </div>
   );
 };
 
 export default function HealthDashboard({ health, project }) {
+  let shipColor = 'var(--success)';
+  let ShipIcon = CheckCircle;
+  let shipText = 'Ready to Ship';
+  
+  if (health.shipStatus === 'not-ready') {
+    shipColor = 'var(--danger)';
+    ShipIcon = AlertCircle;
+    shipText = 'Not Ready';
+  } else if (health.shipStatus === 'ready-with-warnings') {
+    shipColor = 'var(--warning)';
+    ShipIcon = AlertTriangle;
+    shipText = 'Ready (Warnings)';
+  }
+
   return (
     <div className={styles.dashboard}>
       <div className={styles.mainScore}>
         <h3>Project Health</h3>
         <HealthGauge score={health.score} confidence={health.confidence} />
+        <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: shipColor, fontWeight: 'bold' }}>
+          <ShipIcon size={20} />
+          {shipText}
+        </div>
         <p className={styles.scoreDescription}>
-          Based on architecture, dependencies, security, and quality rules.
+          Based on architecture, dependencies, security, and quality rules. Analysis coverage: {health.coverage}%.
         </p>
       </div>
 

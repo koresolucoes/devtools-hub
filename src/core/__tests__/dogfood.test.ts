@@ -62,7 +62,7 @@ describe('DevsHub Dogfood Analysis', () => {
     expect(result.project.repository.repo).toBe('devtools-hub');
     expect(result.project.packageManagers.some(pm => pm.name === 'npm')).toBe(true);
     
-    expect(Array.isArray(result.findings)).toBe(true);
+    expect(Array.isArray(result.checks)).toBe(true);
     expect(result.health.score).toBeGreaterThan(0);
     expect(result.health.categories.quality).toBeDefined();
     expect(result.health.confidence).toBeGreaterThan(50);

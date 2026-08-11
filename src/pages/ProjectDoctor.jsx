@@ -32,9 +32,28 @@ export default function ProjectDoctor() {
     setStatus('ANALYZING');
     setError(null);
     setResult(null);
+    setLoadingLogs([]);
 
     try {
-      const analysisResult = await analyzeProject(repoUrl);
+      const analysisResult = await analyzeProject(repoUrl, {
+        dependencySecurity: true,
+        onProgress: (stage, progress) => {
+          let message = '';
+          switch (stage) {
+            case 'ANALYZING_REPOSITORY': message = '[System] Initializing DevsHub Project Doctor engine...\n[Network] Fetching repository metadata...'; break;
+            case 'SCANNING_SECURITY': message = '[Scanner] Cross-referencing OSV vulnerability database...'; break;
+            case 'EVALUATING_RULES': message = '[Analyzer] Detecting languages, frameworks, and tools...\n[Rules] Evaluating health checks...'; break;
+            case 'CALCULATING_HEALTH': message = '[Engine] Finalizing project IR and generating remediation...'; break;
+            case 'COMPLETE': message = '[System] Analysis complete.'; break;
+            default: message = `[System] Progress: ${progress}%`;
+          }
+          if (message) {
+            message.split('\n').forEach(msg => {
+              setLoadingLogs(prev => [...prev, msg]);
+            });
+          }
+        }
+      });
       setResult(analysisResult);
       setStatus('SUCCESS');
     } catch (err) {
@@ -48,31 +67,6 @@ export default function ProjectDoctor() {
   };
 
   const [loadingLogs, setLoadingLogs] = useState([]);
-  
-  useEffect(() => {
-    if (status === 'ANALYZING') {
-      const logs = [
-        '[System] Initializing DevsHub Project Doctor engine...',
-        '[Network] Fetching repository metadata...',
-        '[Parser] Extracting package manifests and dependencies...',
-        '[Scanner] Cross-referencing OSV vulnerability database...',
-        '[Analyzer] Detecting languages, frameworks, and tools...',
-        '[Rules] Evaluating CI/CD and architecture health...',
-        '[Engine] Finalizing project IR and generating remediation...'
-      ];
-      let currentLogIndex = 0;
-      setLoadingLogs([]);
-      
-      const interval = setInterval(() => {
-        if (currentLogIndex < logs.length) {
-          setLoadingLogs(prev => [...prev, logs[currentLogIndex]]);
-          currentLogIndex++;
-        }
-      }, 600); // add a new log every 600ms
-      
-      return () => clearInterval(interval);
-    }
-  }, [status]);
 
   return (
     <div className={styles.container}>
@@ -149,7 +143,7 @@ export default function ProjectDoctor() {
                 className={`${styles.tab} ${activeTab === 'findings' ? styles.activeTab : ''}`}
                 onClick={() => setActiveTab('findings')}
               >
-                Findings ({result.findings.length})
+                Findings ({result.checks.filter(c => c.finding).length})
               </button>
               <button 
                 className={`${styles.tab} ${activeTab === 'architecture' ? styles.activeTab : ''}`}
@@ -161,7 +155,7 @@ export default function ProjectDoctor() {
 
             <div className={styles.tabContent}>
               {activeTab === 'findings' && (
-                <FindingsList findings={result.findings} />
+                <FindingsList findings={result.checks.filter(c => c.finding).map(c => c.finding)} />
               )}
 
               {activeTab === 'architecture' && (

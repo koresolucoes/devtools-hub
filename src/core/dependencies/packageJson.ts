@@ -9,13 +9,31 @@ export const packageJsonParser: DependencyParser = {
 
       if (parsed.dependencies) {
         for (const [name, version] of Object.entries(parsed.dependencies)) {
-          deps.push({ name, version: version as string, ecosystem: 'npm', direct: true, dev: false, source: 'package.json' });
+          deps.push({ 
+            name, 
+            ecosystem: 'npm', 
+            declaredRange: version as string,
+            resolutionStatus: 'unresolved',
+            direct: true, 
+            dev: false, 
+            transitive: false,
+            source: 'package.json' 
+          });
         }
       }
 
       if (parsed.devDependencies) {
         for (const [name, version] of Object.entries(parsed.devDependencies)) {
-          deps.push({ name, version: version as string, ecosystem: 'npm', direct: true, dev: true, source: 'package.json' });
+          deps.push({ 
+            name, 
+            ecosystem: 'npm', 
+            declaredRange: version as string,
+            resolutionStatus: 'unresolved',
+            direct: true, 
+            dev: true, 
+            transitive: false,
+            source: 'package.json' 
+          });
         }
       }
 
