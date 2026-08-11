@@ -8,18 +8,46 @@ export function createEmptyProjectIR(repo: RepositoryContext): ProjectIR {
   return {
     schemaVersion: '1',
     repository: repo,
-    technologies: [],
+    
+    languages: [],
+    frameworks: [],
+    runtimes: [],
+    packageManagers: [],
+    
+    manifests: [],
+    scripts: {},
     dependencies: [],
     
-    primaryLanguage: 'unknown',
-    packageManager: 'unknown',
-    frameworks: [],
+    infrastructure: {
+      ci: [],
+      deployments: []
+    },
     
-    ciTool: 'none',
-    deployTarget: 'unknown',
+    quality: {
+      tests: [],
+      linters: [],
+      typecheckers: []
+    },
     
-    hasTests: false,
-    hasLinting: false,
-    hasTypeChecking: false
+    environment: {
+      declaredVariables: [],
+      sourceFiles: []
+    },
+    
+    databases: [],
+    
+    ai: {
+      providers: [],
+      sdkDependencies: []
+    },
+    
+    files: [],
+    
+    analysis: {
+      partial: false,
+      warnings: [],
+      analyzedAt: new Date().toISOString(),
+      analyzerVersion: '1.0.0'
+    }
   };
 }

@@ -88,18 +88,22 @@ function formatVulnerabilities(rawResults) {
     const severityScores = { 'CRITICAL': 5, 'HIGH': 4, 'MODERATE': 3, 'MEDIUM': 3, 'LOW': 2, 'UNKNOWN': 1 };
     
     result.vulns.forEach(vuln => {
-      if (vuln.severity) {
-        const cvss = vuln.severity.find(s => s.type === 'CVSS_V3');
-        if (cvss) {
-          const scoreMatch = cvss.score.match(/CVSS:3.\d\/.*?\/.*?(?:[A-Z]:[A-Z]+\/)*.*?/);
+      let currentSeverity = 'UNKNOWN';
+
+      if (vuln.database_specific && vuln.database_specific.severity) {
+        currentSeverity = vuln.database_specific.severity.toUpperCase();
+      } else if (vuln.severity) {
+        const cvss = vuln.severity.find(s => s.type === 'CVSS_V3' || s.type === 'CVSS_V4');
+        if (cvss && cvss.score) {
+          // Parse score string for base score if possible, or just default to HIGH if it has a vector
+          // Actually, OSV sometimes provides `score` as the vector string. 
+          // We can't parse it trivially, so if CVSS exists but no specific severity is there, 
+          // we might just keep UNKNOWN, or try to guess. Let's just keep UNKNOWN if we can't parse it.
         }
       }
-      
-      if (vuln.database_specific && vuln.database_specific.severity) {
-        const sev = vuln.database_specific.severity.toUpperCase();
-        if (severityScores[sev] > severityScores[maxSeverity]) {
-          maxSeverity = sev;
-        }
+
+      if (severityScores[currentSeverity] > severityScores[maxSeverity]) {
+        maxSeverity = currentSeverity;
       }
     });
 

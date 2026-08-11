@@ -1,31 +1,77 @@
-// Internal registry with current stable versions for GitHub Actions and Docker integration
-export const ACTION_REGISTRY = {
+export interface ActionRegistryEntry {
+  id: string;
+  repository: string;
+  recommendedVersion: string;
+  uses: string;
+  official: boolean;
+  category: 'source' | 'runtime' | 'package-manager' | 'docker' | 'deployment';
+  verifiedAt: string | null;
+  source?: string;
+}
+
+export const ACTION_REGISTRY: Record<string, ActionRegistryEntry> = {
   checkout: {
-    uses: 'actions/checkout@v6',
-    description: 'Official checkout action for fetching repo source'
+    id: 'actions-checkout',
+    repository: 'actions/checkout',
+    recommendedVersion: 'v4',
+    uses: 'actions/checkout@v4',
+    official: true,
+    category: 'source',
+    verifiedAt: '2026-08-01',
+    source: 'https://github.com/actions/checkout'
   },
   setupNode: {
+    id: 'actions-setup-node',
+    repository: 'actions/setup-node',
+    recommendedVersion: 'v4',
     uses: 'actions/setup-node@v4',
-    description: 'Setup Node.js environment with caching'
+    official: true,
+    category: 'runtime',
+    verifiedAt: '2026-08-01'
   },
   setupPython: {
-    uses: 'actions/setup-python@v6',
-    description: 'Setup Python environment with caching'
+    id: 'actions-setup-python',
+    repository: 'actions/setup-python',
+    recommendedVersion: 'v5',
+    uses: 'actions/setup-python@v5',
+    official: true,
+    category: 'runtime',
+    verifiedAt: '2026-08-01'
   },
   dockerLogin: {
-    uses: 'docker/login-action@v4',
-    description: 'Official Docker login action'
-  },
-  dockerBuildx: {
-    uses: 'docker/setup-buildx-action@v3',
-    description: 'Docker Buildx multi-platform build setup'
+    id: 'docker-login-action',
+    repository: 'docker/login-action',
+    recommendedVersion: 'v3',
+    uses: 'docker/login-action@v3',
+    official: true,
+    category: 'docker',
+    verifiedAt: '2026-08-01'
   },
   dockerBuildPush: {
-    uses: 'docker/build-push-action@v7',
-    description: 'Build and push Docker images using Buildx'
+    id: 'docker-build-push-action',
+    repository: 'docker/build-push-action',
+    recommendedVersion: 'v6',
+    uses: 'docker/build-push-action@v6',
+    official: true,
+    category: 'docker',
+    verifiedAt: '2026-08-01'
+  },
+  dockerBuildx: {
+    id: 'docker-setup-buildx-action',
+    repository: 'docker/setup-buildx-action',
+    recommendedVersion: 'v3',
+    uses: 'docker/setup-buildx-action@v3',
+    official: true,
+    category: 'docker',
+    verifiedAt: '2026-08-01'
   },
   vercel: {
+    id: 'vercel-action',
+    repository: 'amondnet/vercel-action',
+    recommendedVersion: 'v25',
     uses: 'amondnet/vercel-action@v25',
-    description: 'Deploy project to Vercel'
+    official: false,
+    category: 'deployment',
+    verifiedAt: '2026-08-01'
   }
 };

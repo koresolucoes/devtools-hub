@@ -7,7 +7,9 @@ export interface AIModel {
   outputPricePerMillion: number;
   contextWindow: number;
   currency: 'USD';
-  verifiedAt: string;
+  verifiedAt: string | null;
+  source?: string;
+  status: 'verified' | 'unverified' | 'deprecated';
 }
 
 export const MODEL_REGISTRY: Record<string, AIModel> = {
@@ -20,7 +22,8 @@ export const MODEL_REGISTRY: Record<string, AIModel> = {
     outputPricePerMillion: 10.00,
     contextWindow: 128000,
     currency: 'USD',
-    verifiedAt: '2026-08-01'
+    verifiedAt: null,
+    status: 'unverified'
   },
   gpt4oMini: {
     id: 'gpt-4o-mini',
@@ -31,7 +34,8 @@ export const MODEL_REGISTRY: Record<string, AIModel> = {
     outputPricePerMillion: 0.60,
     contextWindow: 128000,
     currency: 'USD',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    status: 'verified'
   },
   claude35Sonnet: {
     id: 'claude-3-5-sonnet-20240620',
@@ -42,7 +46,8 @@ export const MODEL_REGISTRY: Record<string, AIModel> = {
     outputPricePerMillion: 15.00,
     contextWindow: 200000,
     currency: 'USD',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    status: 'verified'
   },
   claude3Haiku: {
     id: 'claude-3-haiku-20240307',
@@ -53,6 +58,7 @@ export const MODEL_REGISTRY: Record<string, AIModel> = {
     outputPricePerMillion: 1.25,
     contextWindow: 200000,
     currency: 'USD',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    status: 'verified'
   }
 };

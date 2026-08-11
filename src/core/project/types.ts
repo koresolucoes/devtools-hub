@@ -1,14 +1,55 @@
+export type Confidence = 'high' | 'medium' | 'low';
+
+export interface Evidence {
+  source: string;
+  file?: string;
+  path?: string;
+  line?: number;
+  value?: string;
+  message: string;
+}
+
 export interface DetectedTechnology {
+  id: string;
   name: string;
+  category: 
+    | 'language' 
+    | 'framework' 
+    | 'runtime' 
+    | 'database' 
+    | 'deployment' 
+    | 'ci' 
+    | 'testing' 
+    | 'linting' 
+    | 'typechecking' 
+    | 'ai' 
+    | 'agent' 
+    | 'tooling';
   version?: string;
-  ecosystem: 'node' | 'python' | 'docker' | 'unknown';
-  evidence: string[]; // e.g., ["Found package.json", "react in dependencies"]
+  confidence: Confidence;
+  evidence: Evidence[];
 }
 
 export interface Dependency {
   name: string;
   version: string;
-  type: 'production' | 'development' | 'peer';
+  ecosystem: 'npm' | 'PyPI';
+  direct: boolean;
+  dev: boolean;
+  source: string;
+  evidence?: Evidence[];
+}
+
+export interface PackageManagerInfo {
+  name: 'npm' | 'yarn' | 'pnpm' | 'bun' | 'pip' | 'poetry' | 'uv' | 'unknown';
+  version?: string;
+  confidence: Confidence;
+  evidence: Evidence[];
+}
+
+export interface ProjectManifest {
+  path: string;
+  type: 'package.json' | 'pyproject.toml' | 'requirements.txt';
 }
 
 export interface EnvironmentVariable {
@@ -26,6 +67,33 @@ export interface RepositoryContext {
   url: string;
 }
 
+export interface CIInfo {
+  name: string;
+  provider: 'github_actions' | 'gitlab_ci' | 'unknown';
+  workflows: string[];
+}
+
+export interface DockerInfo {
+  hasDockerfile: boolean;
+  hasCompose: boolean;
+  images: string[];
+}
+
+export interface MCPInfo {
+  servers: string[];
+}
+
+export interface AgentInfo {
+  name: string;
+  type: 'claude' | 'cursor' | 'copilot' | 'custom';
+}
+
+export interface ProjectFileSummary {
+  path: string;
+  size?: number;
+  type?: string;
+}
+
 /**
  * Project Intermediate Representation (ProjectIR)
  * Source of truth for all tools (Pipeline, Project Doctor, OSV Scanner)
@@ -33,19 +101,48 @@ export interface RepositoryContext {
 export interface ProjectIR {
   schemaVersion: '1';
   repository: RepositoryContext;
-  technologies: DetectedTechnology[];
+  
+  languages: DetectedTechnology[];
+  frameworks: DetectedTechnology[];
+  runtimes: DetectedTechnology[];
+  packageManagers: PackageManagerInfo[];
+  
+  manifests: ProjectManifest[];
+  scripts: Record<string, string>;
   dependencies: Dependency[];
   
-  // High-level normalized facts
-  primaryLanguage: 'node' | 'python' | 'go' | 'rust' | 'unknown';
-  packageManager: 'npm' | 'yarn' | 'pnpm' | 'bun' | 'pip' | 'poetry' | 'uv' | 'unknown';
-  frameworks: string[]; // e.g. ["react", "nextjs", "vite"]
+  infrastructure: {
+    ci: CIInfo[];
+    docker?: DockerInfo;
+    deployments: DetectedTechnology[];
+  };
   
-  // Execution context
-  ciTool: 'github_actions' | 'gitlab_ci' | 'none';
-  deployTarget: 'vercel' | 'docker' | 'unknown';
+  quality: {
+    tests: DetectedTechnology[];
+    linters: DetectedTechnology[];
+    typecheckers: DetectedTechnology[];
+  };
   
-  hasTests: boolean;
-  hasLinting: boolean;
-  hasTypeChecking: boolean;
+  environment: {
+    declaredVariables: EnvironmentVariable[];
+    sourceFiles: string[];
+  };
+  
+  databases: DetectedTechnology[];
+  
+  ai: {
+    providers: DetectedTechnology[];
+    sdkDependencies: Dependency[];
+    mcp?: MCPInfo;
+    agents?: AgentInfo[];
+  };
+  
+  files: ProjectFileSummary[];
+  
+  analysis: {
+    partial: boolean;
+    warnings: string[];
+    analyzedAt: string;
+    analyzerVersion: string;
+  };
 }

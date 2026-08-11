@@ -91,7 +91,10 @@ function TokenEstimator() {
             placeholder="Paste your System Prompt, RAG chunks, or large context here to analyze..."
           />
           <div className="stats-bar mt-2" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span>Tokenizer: {activeModel.tokenizer} | Pricing verified: {activeModel.verifiedAt}</span>
+            <span>
+              Tokenizer: {activeModel.tokenizer} | Pricing:{' '}
+              {activeModel.status === 'verified' ? `verified on ${activeModel.verifiedAt}` : 'unverified assumption'}
+            </span>
             <select className="text-input" value={selectedModel} onChange={e => setSelectedModel(e.target.value)} style={{ padding: '0.4rem', width: '200px' }}>
               {Object.entries(MODEL_REGISTRY).map(([k, m]) => <option key={k} value={k}>{m.name}</option>)}
             </select>

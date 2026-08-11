@@ -1,21 +1,21 @@
-import type { ParsedDependency, DependencyParser } from './types';
+import type { Dependency, DependencyParser } from './types';
 
 export const packageJsonParser: DependencyParser = {
   filename: 'package.json',
-  parse(content: string): ParsedDependency[] {
+  parse(content: string): Dependency[] {
     try {
       const parsed = JSON.parse(content);
-      const deps: ParsedDependency[] = [];
+      const deps: Dependency[] = [];
 
       if (parsed.dependencies) {
         for (const [name, version] of Object.entries(parsed.dependencies)) {
-          deps.push({ name, version: version as string, ecosystem: 'npm' });
+          deps.push({ name, version: version as string, ecosystem: 'npm', direct: true, dev: false, source: 'package.json' });
         }
       }
 
       if (parsed.devDependencies) {
         for (const [name, version] of Object.entries(parsed.devDependencies)) {
-          deps.push({ name, version: version as string, ecosystem: 'npm' });
+          deps.push({ name, version: version as string, ecosystem: 'npm', direct: true, dev: true, source: 'package.json' });
         }
       }
 

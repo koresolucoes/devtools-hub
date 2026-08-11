@@ -1,10 +1,8 @@
-export interface ParsedDependency {
-  name: string;
-  version: string;
-  ecosystem: 'npm' | 'PyPI';
-}
+import { Dependency } from '../project/types';
+
+export type { Dependency };
 
 export interface DependencyParser {
   filename: string;
-  parse(content: string): ParsedDependency[];
+  parse(content: string): Dependency[];
 }
