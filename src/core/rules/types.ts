@@ -1,8 +1,7 @@
 import type { Evidence, Confidence } from '../project/types';
+import type { HealthCategory } from '../checks/types';
 
 export type FindingSeverity = 'critical' | 'high' | 'medium' | 'moderate' | 'low' | 'info' | 'unknown';
-
-export type FindingCategory = 'build' | 'security' | 'quality' | 'ci' | 'deployment' | 'environment' | 'maintainability' | 'architecture' | 'dependencies';
 
 export interface Remediation {
   summary: string;
@@ -18,7 +17,7 @@ export interface Finding {
   title: string;
   description: string;
   severity: FindingSeverity;
-  category?: FindingCategory;
+  category: HealthCategory;
   impact: string;
   remediation: Remediation | string;
   evidence?: Evidence[];

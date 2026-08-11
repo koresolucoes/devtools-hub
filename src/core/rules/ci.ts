@@ -21,10 +21,10 @@ export function runCIRules(ir: ProjectIR): CheckResult[] {
       finding: {
         id: 'CI001',
         title: 'No repository CI workflow detected',
-        description: 'No CI tool like GitHub Actions or GitLab CI was detected.',
+        description: 'No repository-level CI workflow was detected in the supported locations.',
         severity: 'low',
         category: 'ci',
-        impact: 'Manual deployments or untested code merging into default branch.',
+        impact: 'Pull requests or pushes may not receive repository-level automated test/build validation before deployment or merge.',
         remediation: {
           summary: 'Use Pipeline Architect to generate a CI workflow for your stack.',
           steps: ['Generate workflow', 'Commit to repository']

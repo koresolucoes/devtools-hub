@@ -1,15 +1,27 @@
 import type { Dependency } from '../project/types';
-import type { OSVQuery, OSVBatchResponse, OSVVulnerability, DependencyVulnerability } from './types';
+import type { OSVQuery, OSVBatchResponse, OSVVulnerability, DependencyVulnerability, SecurityScanSummary } from './types';
 import { normalizeSeverity } from './normalizeVulnerability';
 import { findRecommendedFixedVersion } from './fixedVersion';
 
 const OSV_API_URL = 'https://api.osv.dev/v1/querybatch';
 
-export async function scanDependencies(dependencies: Dependency[]): Promise<DependencyVulnerability[]> {
+export async function scanDependencies(dependencies: Dependency[]): Promise<{ vulnerabilities: DependencyVulnerability[], summary: SecurityScanSummary }> {
+  const summary: SecurityScanSummary = {
+    status: 'complete',
+    totalDependencies: dependencies.length,
+    resolvedDependencies: 0,
+    queriedDependencies: 0,
+    successfulQueries: 0,
+    failedQueries: 0,
+    affectedPackageVersions: 0,
+    advisories: 0
+  };
+
   const uniqueQueries = new Map<string, { query: OSVQuery; deps: Dependency[] }>();
 
   for (const dep of dependencies) {
     if (dep.resolutionStatus === 'resolved' && dep.resolvedVersion) {
+      summary.resolvedDependencies++;
       const key = `${dep.ecosystem}:${dep.name}:${dep.resolvedVersion}`;
       if (!uniqueQueries.has(key)) {
         uniqueQueries.set(key, {
@@ -29,10 +41,16 @@ export async function scanDependencies(dependencies: Dependency[]): Promise<Depe
 
   const queryItems = Array.from(uniqueQueries.values());
   const queries = queryItems.map(q => q.query);
-  if (queries.length === 0) return [];
+  summary.queriedDependencies = queries.length;
+
+  if (queries.length === 0) {
+    summary.status = 'skipped';
+    return { vulnerabilities: [], summary };
+  }
 
   const chunkSize = 500;
   const rawResults: { deps: Dependency[]; slimVulns: { id: string }[] }[] = [];
+  let apiFailed = false;
 
   for (let i = 0; i < queries.length; i += chunkSize) {
     const chunk = queries.slice(i, i + chunkSize);
@@ -49,6 +67,7 @@ export async function scanDependencies(dependencies: Dependency[]): Promise<Depe
       }
 
       const data: OSVBatchResponse = await response.json();
+      summary.successfulQueries += chunk.length;
       
       for (let index = 0; index < data.results.length; index++) {
         const result = data.results[index];
@@ -61,17 +80,30 @@ export async function scanDependencies(dependencies: Dependency[]): Promise<Depe
       }
     } catch (error) {
       console.error("Error querying OSV API:", error);
-      throw error; 
+      summary.failedQueries += chunk.length;
+      apiFailed = true;
     }
+  }
+
+  if (apiFailed) {
+    summary.status = summary.successfulQueries > 0 ? 'partial' : 'failed';
   }
 
   // Deduplicate detailed fetches
   const uniqueVulnIds = new Set<string>();
+  const affectedKeys = new Set<string>();
+
   for (const res of rawResults) {
+    for (const dep of res.deps) {
+      affectedKeys.add(`${dep.ecosystem}:${dep.name}:${dep.resolvedVersion}`);
+    }
     for (const v of res.slimVulns) {
       uniqueVulnIds.add(v.id);
     }
   }
+  
+  summary.affectedPackageVersions = affectedKeys.size;
+  summary.advisories = uniqueVulnIds.size;
 
   const detailedVulns = new Map<string, OSVVulnerability>();
   
@@ -123,5 +155,5 @@ export async function scanDependencies(dependencies: Dependency[]): Promise<Depe
     }
   }
 
-  return finalVulns;
+  return { vulnerabilities: finalVulns, summary };
 }

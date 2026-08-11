@@ -38,7 +38,7 @@ Please fix the following issue in my repository.
 
 [ISSUE DETAILS]
 - Finding: ${finding.title}
-- Category: ${finding.category || 'general'}
+- Category: ${finding.category}
 - Impact: ${finding.impact || 'N/A'}
 
 [EVIDENCE]
@@ -84,7 +84,7 @@ ${remediationText}
           <SeverityBadge severity={finding.severity} />
           <h4 className={styles.findingTitle}>{finding.title}</h4>
         </div>
-        <span className={styles.findingCategory}>{(finding.category || 'general').toUpperCase()}</span>
+        <span className={styles.findingCategory}>{(finding.category).toUpperCase()}</span>
       </div>
       
       <p className={styles.findingDescription}>{finding.description}</p>

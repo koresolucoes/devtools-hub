@@ -57,7 +57,19 @@ describe('KoreGastro2 Regression Suite', () => {
   it('correctly handles edge cases like Node native test runner and multiple lockfiles', async () => {
     const provider = new LocalFixtureProvider(path.resolve(__dirname, '../../../tests/fixtures/repos/koregastro2'));
     const ir = await analyzeRepository(provider);
-    const checks = runChecks(ir, { vulnerabilities: [] });
+    const checks = runChecks(ir, { 
+      vulnerabilities: [],
+      securitySummary: {
+        status: 'skipped',
+        totalDependencies: ir.dependencies.length,
+        resolvedDependencies: 0,
+        queriedDependencies: 0,
+        successfulQueries: 0,
+        failedQueries: 0,
+        affectedPackageVersions: 0,
+        advisories: 0
+      }
+    });
     const health = calculateProjectHealth(ir, checks);
 
     // QUALITY: Should detect Node Test Runner and tsc
@@ -80,7 +92,7 @@ describe('KoreGastro2 Regression Suite', () => {
     expect(lockfileConflict?.status).toBe('fail'); // because package-lock.json and bun.lock exist
 
     // COVERAGE: Should compute a valid coverage
-    expect(health.coverage).toBeGreaterThan(0);
-    expect(health.coverage).toBeLessThanOrEqual(100);
+    expect(health.coverage.checkCoverage).toBeGreaterThan(0);
+    expect(health.coverage.checkCoverage).toBeLessThanOrEqual(100);
   });
 });

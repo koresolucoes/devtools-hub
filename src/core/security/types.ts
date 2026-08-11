@@ -80,10 +80,9 @@ export interface SecurityScanSummary {
   status: 'complete' | 'partial' | 'failed' | 'skipped';
   totalDependencies: number;
   resolvedDependencies: number;
-  scannedDependencies: number;
-  unresolvedDependencies: number;
-  directDependencies: number;
-  transitiveDependencies: number;
-  advisoriesFound: number;
-  affectedPackages: number;
+  queriedDependencies: number;
+  successfulQueries: number;
+  failedQueries: number;
+  affectedPackageVersions: number;
+  advisories: number;
 }

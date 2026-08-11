@@ -65,6 +65,6 @@ describe('DevsHub Dogfood Analysis', () => {
     expect(Array.isArray(result.checks)).toBe(true);
     expect(result.health.score).toBeGreaterThan(0);
     expect(result.health.categories.quality).toBeDefined();
-    expect(result.health.confidence).toBeGreaterThan(50);
+    expect(result.health.analysisConfidence).toBeGreaterThan(50);
   }, 30000);
 });

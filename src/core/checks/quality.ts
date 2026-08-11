@@ -26,8 +26,9 @@ export function runQualityChecks(ir: ProjectIR): CheckResult[] {
       category: 'quality',
       status: 'fail',
       finding: {
-        id: 'QUALITY001',
-        title: 'Missing Test Suite',
+        id: 'QUAL001',
+        title: 'No Testing Framework Detected',
+        category: 'quality',
         severity: 'high',
         description: 'No testing framework, test commands, or test files were detected.',
         impact: 'Lack of automated testing severely impacts long-term maintainability and confidence in refactoring.',
@@ -53,8 +54,9 @@ export function runQualityChecks(ir: ProjectIR): CheckResult[] {
       category: 'quality',
       status: 'fail',
       finding: {
-        id: 'QUALITY002',
-        title: 'Missing Code Linter',
+        id: 'QUAL002',
+        title: 'No Linter Detected',
+        category: 'quality',
         severity: 'moderate',
         description: hasLintScript 
           ? 'A "lint" script was found but no actual linter (ESLint, Oxlint, Biome) was detected in dependencies or configuration.'
@@ -79,8 +81,9 @@ export function runQualityChecks(ir: ProjectIR): CheckResult[] {
       category: 'quality',
       status: 'fail',
       finding: {
-        id: 'QUALITY003',
-        title: 'Missing Static Type Checking',
+        id: 'QUAL003',
+        title: 'No Type Checker Detected',
+        category: 'quality',
         severity: 'moderate',
         description: 'No static type checker (like TypeScript or Mypy) was found.',
         impact: 'Type-related bugs may reach production.',

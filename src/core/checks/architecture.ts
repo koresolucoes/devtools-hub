@@ -25,6 +25,7 @@ export function runArchitectureChecks(ir: ProjectIR): CheckResult[] {
       finding: {
         id: 'ARCH001',
         title: 'Multiple Package Manager Lockfiles',
+        category: 'architecture',
         severity: 'medium',
         description: `Found conflicting root lockfiles: ${lockfileList}.`,
         impact: 'Different environments may resolve dependencies using different package managers, producing inconsistent dependency graphs.',

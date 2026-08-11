@@ -7,5 +7,6 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    exclude: ['tests/fixtures/**', 'node_modules/**', 'dist/**']
   }
 })

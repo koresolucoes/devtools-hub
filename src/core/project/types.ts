@@ -107,6 +107,15 @@ export interface ProjectFileSummary {
   type?: string;
 }
 
+export interface AnalysisMetrics {
+  repositoryFiles: number;
+  relevantFiles: number;
+  selectedFiles: number;
+  fetchedFiles: number;
+  skippedFiles: number;
+  analyzedBytes: number;
+}
+
 /**
  * Project Intermediate Representation (ProjectIR)
  * Source of truth for all tools (Pipeline, Project Doctor, OSV Scanner)
@@ -161,5 +170,6 @@ export interface ProjectIR {
     warnings: string[];
     analyzedAt: string;
     analyzerVersion: string;
+    metrics?: AnalysisMetrics;
   };
 }

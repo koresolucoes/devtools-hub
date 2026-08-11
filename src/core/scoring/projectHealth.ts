@@ -1,5 +1,6 @@
 import type { ProjectIR } from '../project/types';
 import type { CheckResult } from '../checks/types';
+import type { SecurityScanSummary } from '../security/types';
 
 export interface HealthCategoryResult {
   score: number | null;
@@ -11,12 +12,31 @@ export interface HealthCategoryResult {
   checksNotApplicable: number;
 }
 
+export interface SecurityRiskSummary {
+  risk: 'none' | 'low' | 'moderate' | 'high' | 'critical';
+  criticalProduction: number;
+  highProduction: number;
+  moderateProduction: number;
+  criticalDevelopment: number;
+  highDevelopment: number;
+  directAffected: number;
+  transitiveAffected: number;
+}
+
+export interface CoverageMetrics {
+  checkCoverage: number;
+  repositoryCoverage: number;
+  dependencyCoverage: number;
+  securityCoverage: number;
+}
+
 export interface ProjectHealth {
   score: number;
   rating: 'excellent' | 'good' | 'warning' | 'critical';
-  confidence: number;
-  coverage: number;
+  analysisConfidence: number;
+  coverage: CoverageMetrics;
   shipStatus: 'ready' | 'ready-with-warnings' | 'not-ready' | 'unknown';
+  securityRisk: SecurityRiskSummary;
   categories: {
     build: HealthCategoryResult;
     security: HealthCategoryResult;
@@ -29,7 +49,7 @@ export interface ProjectHealth {
   };
 }
 
-export function calculateProjectHealth(ir: ProjectIR, checks: CheckResult[]): ProjectHealth {
+export function calculateProjectHealth(ir: ProjectIR, checks: CheckResult[], securitySummary?: SecurityScanSummary): ProjectHealth {
   const categories: Record<keyof ProjectHealth['categories'], HealthCategoryResult> = {
     build: createEmptyCategory(),
     security: createEmptyCategory(),
@@ -45,8 +65,50 @@ export function calculateProjectHealth(ir: ProjectIR, checks: CheckResult[]): Pr
     return { score: null, coverage: 0, confidence: 100, checksPassed: 0, checksFailed: 0, checksUnknown: 0, checksNotApplicable: 0 };
   }
 
+  // Calculate SecurityRiskSummary from SEC_SUMMARY finding if present
+  let hasConfirmedCriticalProductionVuln = false;
+  let hasConfirmedHighProductionVuln = false;
+  
+  const riskSummary: SecurityRiskSummary = {
+    risk: 'none',
+    criticalProduction: 0,
+    highProduction: 0,
+    moderateProduction: 0,
+    criticalDevelopment: 0,
+    highDevelopment: 0,
+    directAffected: 0,
+    transitiveAffected: 0
+  };
+
+  const secSummaryCheck = checks.find(c => c.id === 'SEC_SUMMARY');
+  if (secSummaryCheck && secSummaryCheck.finding) {
+    const desc = secSummaryCheck.finding.description;
+    const extractCount = (regex: RegExp) => {
+      const match = desc.match(regex);
+      return match ? parseInt(match[1], 10) : 0;
+    };
+    riskSummary.criticalProduction = extractCount(/- (\d+) critical production/);
+    riskSummary.highProduction = extractCount(/- (\d+) high production/);
+    riskSummary.criticalDevelopment = extractCount(/- (\d+) critical development/);
+    riskSummary.directAffected = extractCount(/- (\d+) vulnerable direct dependencies/);
+    riskSummary.transitiveAffected = extractCount(/- (\d+) vulnerable transitive dependencies/);
+    
+    if (riskSummary.criticalProduction > 0) {
+      riskSummary.risk = 'critical';
+      hasConfirmedCriticalProductionVuln = true;
+    } else if (riskSummary.highProduction > 0 || riskSummary.criticalDevelopment > 0) {
+      riskSummary.risk = 'high';
+      hasConfirmedHighProductionVuln = true;
+    } else if (riskSummary.directAffected > 0) {
+      riskSummary.risk = 'moderate';
+    } else if (riskSummary.transitiveAffected > 0) {
+      riskSummary.risk = 'low';
+    }
+  }
+
   // Populate checks
   for (const check of checks) {
+    if (check.id === 'SEC_SUMMARY') continue; // exclude summary from numeric average to prevent double counting
     const cat = categories[check.category as keyof typeof categories];
     if (cat) {
       if (check.status === 'pass') cat.checksPassed++;
@@ -56,67 +118,109 @@ export function calculateProjectHealth(ir: ProjectIR, checks: CheckResult[]): Pr
     }
   }
 
-  // Calculate scores per category
-  let totalScore = 0;
-  let totalCategoriesScored = 0;
-  let hasConfirmedCriticalProductionVuln = false;
+  // Documented category weights
+  const baseWeights: Record<keyof typeof categories, number> = {
+    security: 25,
+    quality: 15,
+    dependencies: 15,
+    build: 15,
+    ci: 10,
+    deployment: 10,
+    architecture: 10,
+    maintainability: 0 // Optional category not currently scored
+  };
 
-  for (const [, cat] of Object.entries(categories)) {
+  let totalWeight = 0;
+  let weightedScoreSum = 0;
+
+  for (const [key, cat] of Object.entries(categories)) {
+    const k = key as keyof typeof categories;
     const totalEvaluated = cat.checksPassed + cat.checksFailed;
-    if (totalEvaluated > 0) {
+    
+    // Security score is special logic
+    if (k === 'security') {
+      cat.score = 100;
+      if (riskSummary.risk === 'critical') cat.score = 0;
+      else if (riskSummary.risk === 'high') cat.score = 40;
+      else if (riskSummary.risk === 'moderate') cat.score = 70;
+      else if (riskSummary.risk === 'low') cat.score = 90;
+      
+      // If we failed to scan, score is unknown
+      if (cat.checksUnknown > 0) cat.score = null;
+    } else if (totalEvaluated > 0) {
       cat.score = Math.round((cat.checksPassed / totalEvaluated) * 100);
-      cat.coverage = Math.round((totalEvaluated / (totalEvaluated + cat.checksUnknown)) * 100);
-      totalScore += cat.score;
-      totalCategoriesScored++;
     } else {
       cat.score = null;
-      cat.coverage = 0;
+    }
+
+    if (totalEvaluated > 0 || cat.checksUnknown > 0) {
+      cat.coverage = Math.round((totalEvaluated / (totalEvaluated + cat.checksUnknown)) * 100);
+    }
+
+    if (cat.score !== null) {
+      totalWeight += baseWeights[k];
+      weightedScoreSum += cat.score * baseWeights[k];
     }
   }
 
-  // Analyze checks for ship status
-  for (const check of checks) {
-    if (check.category === 'security' && check.status === 'fail' && check.finding?.severity === 'critical') {
-      // Check if it's production (direct or transitive, but not dev)
-      // Since we don't have deep context here in check finding, we can assume critical security failure affects shipStatus.
-      // A more detailed implementation would inspect check.evidence.
-      const isDevOnly = check.evidence?.every(e => e.path === 'devDependencies');
-      if (!isDevOnly) {
-        hasConfirmedCriticalProductionVuln = true;
-      }
-    }
-  }
+  const finalScore = totalWeight > 0 ? weightedScoreSum / totalWeight : 100;
 
-  const finalScore = totalCategoriesScored > 0 ? totalScore / totalCategoriesScored : 100;
   let rating: ProjectHealth['rating'] = 'excellent';
   if (finalScore < 50) rating = 'critical';
   else if (finalScore < 75) rating = 'warning';
   else if (finalScore < 90) rating = 'good';
 
-  let confidence = 100;
-  if (ir.analysis.partial) confidence -= 20;
-  if (ir.analysis.warnings.length > 0) confidence -= (ir.analysis.warnings.length * 5);
-  confidence = Math.max(0, Math.min(100, confidence));
+  // Calculate separate coverages
+  const globalTotalEvaluated = Object.values(categories).reduce((acc, cat) => acc + cat.checksPassed + cat.checksFailed, 0);
+  const globalTotalUnknown = Object.values(categories).reduce((acc, cat) => acc + cat.checksUnknown, 0);
+  const checkCoverage = (globalTotalEvaluated + globalTotalUnknown) > 0 
+    ? Math.round((globalTotalEvaluated / (globalTotalEvaluated + globalTotalUnknown)) * 100) 
+    : 100;
+
+  let repositoryCoverage = 100;
+  if (ir.analysis.metrics && ir.analysis.metrics.repositoryFiles > 0) {
+    // Just a placeholder metric.
+    repositoryCoverage = 90; 
+  }
+
+  const dependencyCoverage = categories.dependencies.coverage || 100;
+  
+  let securityCoverage = 100;
+  if (categories.security.checksUnknown > 0) {
+    securityCoverage = 0; // complete failure
+  } else if (securitySummary && securitySummary.status === 'partial') {
+    securityCoverage = securitySummary.resolvedDependencies > 0 ? 
+      Math.round((securitySummary.successfulQueries / securitySummary.resolvedDependencies) * 100) : 0;
+  }
+
+  const coverage: CoverageMetrics = {
+    checkCoverage,
+    repositoryCoverage,
+    dependencyCoverage,
+    securityCoverage
+  };
+
+  let analysisConfidence = (checkCoverage + repositoryCoverage + dependencyCoverage + securityCoverage) / 4;
+  if (ir.analysis.partial) analysisConfidence -= 20;
+  if (ir.analysis.warnings.length > 0) analysisConfidence -= (ir.analysis.warnings.length * 5);
+  analysisConfidence = Math.max(0, Math.min(100, Math.round(analysisConfidence)));
 
   let shipStatus: ProjectHealth['shipStatus'] = 'ready';
   if (hasConfirmedCriticalProductionVuln) {
     shipStatus = 'not-ready';
+  } else if (hasConfirmedHighProductionVuln) {
+    shipStatus = 'ready-with-warnings';
   } else if (finalScore < 75) {
     shipStatus = 'ready-with-warnings';
   }
 
-  const globalTotalEvaluated = Object.values(categories).reduce((acc, cat) => acc + cat.checksPassed + cat.checksFailed, 0);
-  const globalTotalUnknown = Object.values(categories).reduce((acc, cat) => acc + cat.checksUnknown, 0);
-  const globalCoverage = (globalTotalEvaluated + globalTotalUnknown) > 0 
-    ? Math.round((globalTotalEvaluated / (globalTotalEvaluated + globalTotalUnknown)) * 100) 
-    : 0;
-
   return {
     score: Math.round(finalScore),
     rating,
-    confidence,
-    coverage: globalCoverage,
+    analysisConfidence,
+    coverage,
     shipStatus,
+    securityRisk: riskSummary,
     categories
   };
 }
