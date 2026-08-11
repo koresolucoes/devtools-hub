@@ -27,7 +27,8 @@ export const ACTION_REGISTRY: Record<string, ActionRegistryEntry> = {
     uses: 'actions/setup-node@v4',
     official: true,
     category: 'runtime',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    source: 'https://github.com/actions/setup-node'
   },
   setupPython: {
     id: 'actions-setup-python',
@@ -36,7 +37,8 @@ export const ACTION_REGISTRY: Record<string, ActionRegistryEntry> = {
     uses: 'actions/setup-python@v5',
     official: true,
     category: 'runtime',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    source: 'https://github.com/actions/setup-python'
   },
   dockerLogin: {
     id: 'docker-login-action',
@@ -45,7 +47,8 @@ export const ACTION_REGISTRY: Record<string, ActionRegistryEntry> = {
     uses: 'docker/login-action@v3',
     official: true,
     category: 'docker',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    source: 'https://github.com/docker/login-action'
   },
   dockerBuildPush: {
     id: 'docker-build-push-action',
@@ -54,7 +57,8 @@ export const ACTION_REGISTRY: Record<string, ActionRegistryEntry> = {
     uses: 'docker/build-push-action@v6',
     official: true,
     category: 'docker',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    source: 'https://github.com/docker/build-push-action'
   },
   dockerBuildx: {
     id: 'docker-setup-buildx-action',
@@ -63,7 +67,8 @@ export const ACTION_REGISTRY: Record<string, ActionRegistryEntry> = {
     uses: 'docker/setup-buildx-action@v3',
     official: true,
     category: 'docker',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    source: 'https://github.com/docker/setup-buildx-action'
   },
   vercel: {
     id: 'vercel-action',
@@ -72,6 +77,7 @@ export const ACTION_REGISTRY: Record<string, ActionRegistryEntry> = {
     uses: 'amondnet/vercel-action@v25',
     official: false,
     category: 'deployment',
-    verifiedAt: '2026-08-01'
+    verifiedAt: '2026-08-01',
+    source: 'https://github.com/amondnet/vercel-action'
   }
 };

@@ -25,11 +25,26 @@ export interface Finding {
   remediation?: Remediation;
 }
 
+export interface DependencyVulnerability {
+  id: string;
+  packageName: string;
+  installedVersion: string;
+  ecosystem: string;
+  severity: 'critical' | 'high' | 'moderate' | 'low' | 'unknown';
+  summary?: string;
+  fixedVersion?: string;
+  sourceUrl?: string;
+}
+
+export interface RuleContext {
+  vulnerabilities?: DependencyVulnerability[];
+}
+
 export interface Rule {
   id: string;
   name: string;
   description: string;
   severity: FindingSeverity;
   category: FindingCategory;
-  evaluate: (ir: ProjectIR) => Finding | null;
+  evaluate: (ir: ProjectIR, context?: RuleContext) => Finding | null;
 }

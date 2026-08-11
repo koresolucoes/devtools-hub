@@ -71,12 +71,19 @@ export interface CIInfo {
   name: string;
   provider: 'github_actions' | 'gitlab_ci' | 'unknown';
   workflows: string[];
+  actions?: string[];
+  commands?: string[];
+  triggers?: string[];
+  hasConcurrency?: boolean;
 }
 
 export interface DockerInfo {
   hasDockerfile: boolean;
   hasCompose: boolean;
   images: string[];
+  hasHealthcheck?: boolean;
+  exposedPorts?: number[];
+  isMultiStage?: boolean;
 }
 
 export interface MCPInfo {

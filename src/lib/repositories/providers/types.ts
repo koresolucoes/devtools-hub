@@ -5,10 +5,18 @@ export interface RepositoryMetadata {
   owner: string;
   defaultBranch: string;
   url: string;
+  isPrivate?: boolean;
+  isArchived?: boolean;
+  id?: number;
+}
+
+export interface RepositoryTree {
+  files: ProjectFileSummary[];
+  truncated: boolean;
 }
 
 export interface RepositoryProvider {
   getMetadata(): Promise<RepositoryMetadata>;
-  getTree(): Promise<ProjectFileSummary[]>;
+  getTree(): Promise<RepositoryTree>;
   readFile(path: string): Promise<string | null>;
 }

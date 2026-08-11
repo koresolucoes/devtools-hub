@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldAlert, ArrowRight, Search, BookOpen, Box, Flag, Plug, Baseline, BrainCircuit } from 'lucide-react';
+import { ShieldAlert, ArrowRight, Search, BookOpen, Box, Flag, Plug, Baseline, BrainCircuit, Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import TechFeed from '../components/TechFeed';
 import { tools, guides, templates } from '../data/contentModel';
@@ -8,6 +8,7 @@ import '../index.css';
 
 const getIcon = (slug) => {
   switch(slug) {
+    case 'project-doctor': return <Activity size={20} />;
     case 'osv-dependency-scanner': return <ShieldAlert size={20} />;
     case 'rag-chunking-sandbox': return <BrainCircuit size={20} />;
     case 'token-estimator': return <Baseline size={20} />;
@@ -19,7 +20,7 @@ const getIcon = (slug) => {
 function Hub() {
   const { t } = useTranslation();
   
-  const featuredToolSlug = 'pipeline-architect';
+  const featuredToolSlug = 'project-doctor';
   const featuredTool = tools.find(t => t.slug === featuredToolSlug);
   const gridTools = tools.filter(t => t.slug !== featuredToolSlug);
 
@@ -70,7 +71,7 @@ function Hub() {
             <ShieldAlert size={18} style={{ color: 'var(--danger)' }} />
             <span style={{ color: 'var(--text-primary)', fontSize: '0.875rem', fontWeight: 500 }}>
               <span style={{ color: 'var(--danger)', marginRight: '0.5rem' }}>{t('hub.security_alert', 'SECURITY ALERT')}</span>
-              {t('hub.security_text', 'NPM supply-chain attack affecting 40 packages.')}
+              {t('hub.security_text', 'NPM supply-chain attack affecting 4000 packages.')}
             </span>
           </div>
           <Link to="/tools/osv-dependency-scanner" style={{ color: 'var(--danger)', fontSize: '0.875rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plug, Flag, ShieldAlert, BrainCircuit, Baseline, BookOpen, Box, GitBranch, Database, Server, X } from 'lucide-react';
+import { Search, Plug, Flag, ShieldAlert, BrainCircuit, Baseline, BookOpen, Box, GitBranch, Database, Server, X, Activity } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { tools, guides, templates } from '../data/contentModel';
 
@@ -13,6 +13,7 @@ export default function CommandPalette({ isOpen, onClose, onSnippetSelect }) {
   
   const getIcon = (slug) => {
     switch(slug) {
+      case 'project-doctor': return <Activity size={16} />;
       case 'osv-dependency-scanner': return <ShieldAlert size={16} />;
       case 'rag-chunking-sandbox': return <BrainCircuit size={16} />;
       case 'token-estimator': return <Baseline size={16} />;

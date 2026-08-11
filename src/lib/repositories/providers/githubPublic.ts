@@ -1,25 +1,71 @@
 import type { ProjectFileSummary } from '../../../core/project/types';
-import { RepositoryMetadata, RepositoryProvider } from './types';
+import { RepositoryMetadata, RepositoryProvider, RepositoryTree } from './types';
+import { 
+  RepositoryNotFoundError, 
+  RepositoryRateLimitError, 
+  RepositoryAccessError, 
+  getErrorMessage 
+} from '../../../core/errors';
+
+export interface GitHubTreeItem {
+  path: string;
+  mode: string;
+  type: string;
+  sha: string;
+  size?: number;
+  url: string;
+}
+
+export interface GitHubTreeResponse {
+  sha: string;
+  url: string;
+  tree: GitHubTreeItem[];
+  truncated: boolean;
+}
+
+export interface GitHubRepositoryResponse {
+  name: string;
+  owner: { login: string };
+  default_branch: string;
+  html_url: string;
+  private: boolean;
+  archived: boolean;
+  id: number;
+}
 
 export function parseGitHubUrl(input: string): { owner: string; repo: string } {
   let urlStr = input.trim();
-  if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
+  
+  if (urlStr.endsWith('.git')) {
+    urlStr = urlStr.slice(0, -4);
+  }
+
+  // Handle owner/repo format
+  if (!urlStr.includes('://') && urlStr.split('/').length === 2) {
+    urlStr = 'https://github.com/' + urlStr;
+  } else if (!urlStr.startsWith('http://') && !urlStr.startsWith('https://')) {
     urlStr = 'https://' + urlStr;
   }
+  
   let url: URL;
   try {
     url = new URL(urlStr);
   } catch (e) {
-    throw new Error('Invalid URL format');
+    throw new RepositoryAccessError('Invalid URL format');
   }
 
   if (url.hostname !== 'github.com') {
-    throw new Error('Only github.com URLs are supported');
+    throw new RepositoryAccessError('Only github.com URLs are supported');
   }
 
   const parts = url.pathname.split('/').filter(Boolean);
   if (parts.length < 2) {
-    throw new Error('Invalid GitHub repository URL');
+    throw new RepositoryAccessError('Invalid GitHub repository URL');
+  }
+
+  // Reject deep links
+  if (parts.length > 2) {
+    throw new RepositoryAccessError('Provide a repository root URL, not a deep link (e.g. tree, issues).');
   }
 
   return {
@@ -33,7 +79,6 @@ export class GitHubPublicRepositoryProvider implements RepositoryProvider {
   private repo: string;
   private defaultBranch: string | null = null;
   
-  // Accept optional token for rate limits if passed by env/config later
   private headers: HeadersInit = {
     'Accept': 'application/vnd.github.v3+json'
   };
@@ -44,46 +89,87 @@ export class GitHubPublicRepositoryProvider implements RepositoryProvider {
     this.repo = repo;
   }
 
-  async getMetadata(): Promise<RepositoryMetadata> {
-    const res = await fetch(`https://api.github.com/repos/${this.owner}/${this.repo}`, {
-      headers: this.headers
-    });
-
-    if (!res.ok) {
-      throw new Error(`Failed to fetch repository metadata: ${res.statusText}`);
+  private handleApiError(res: Response, fallbackMessage: string): never {
+    if (res.status === 404) {
+      throw new RepositoryNotFoundError(this.owner, this.repo);
     }
-
-    const data = await res.json();
-    this.defaultBranch = data.default_branch;
-
-    return {
-      name: data.name,
-      owner: data.owner.login,
-      defaultBranch: data.default_branch,
-      url: data.html_url
-    };
+    if (res.status === 403 || res.status === 429) {
+      const resetStr = res.headers.get('x-ratelimit-reset');
+      let resetTime: Date | undefined;
+      if (resetStr) {
+        resetTime = new Date(parseInt(resetStr) * 1000);
+      }
+      throw new RepositoryRateLimitError(
+        `GitHub API rate limit reached. ${resetTime ? `Resets at ${resetTime.toLocaleTimeString()}` : 'Try again later.'}`, 
+        resetTime
+      );
+    }
+    throw new RepositoryAccessError(`${fallbackMessage}: HTTP ${res.status} ${res.statusText}`);
   }
 
-  async getTree(): Promise<ProjectFileSummary[]> {
+  async getMetadata(): Promise<RepositoryMetadata> {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${this.owner}/${this.repo}`, {
+        headers: this.headers
+      });
+
+      if (!res.ok) {
+        this.handleApiError(res, 'Failed to fetch repository metadata');
+      }
+
+      const data = await res.json() as GitHubRepositoryResponse;
+      this.defaultBranch = data.default_branch;
+
+      return {
+        name: data.name,
+        owner: data.owner.login,
+        defaultBranch: data.default_branch,
+        url: data.html_url,
+        isPrivate: data.private,
+        isArchived: data.archived,
+        id: data.id
+      };
+    } catch (e) {
+      if (e instanceof RepositoryNotFoundError || e instanceof RepositoryRateLimitError || e instanceof RepositoryAccessError) {
+        throw e;
+      }
+      throw new RepositoryAccessError(`Failed to fetch metadata: ${getErrorMessage(e)}`);
+    }
+  }
+
+  async getTree(): Promise<RepositoryTree> {
     if (!this.defaultBranch) {
       await this.getMetadata();
     }
 
-    const res = await fetch(`https://api.github.com/repos/${this.owner}/${this.repo}/git/trees/${this.defaultBranch}?recursive=1`, {
-      headers: this.headers
-    });
+    try {
+      const res = await fetch(`https://api.github.com/repos/${this.owner}/${this.repo}/git/trees/${this.defaultBranch}?recursive=1`, {
+        headers: this.headers
+      });
 
-    if (!res.ok) {
-      throw new Error(`Failed to fetch repository tree: ${res.statusText}`);
+      if (!res.ok) {
+        this.handleApiError(res, 'Failed to fetch repository tree');
+      }
+
+      const data = await res.json() as GitHubTreeResponse;
+      
+      const files: ProjectFileSummary[] = data.tree
+        .filter(item => item.type === 'blob' && item.path)
+        .map(item => ({
+          path: item.path,
+          size: item.size
+        }));
+
+      return {
+        files,
+        truncated: data.truncated === true
+      };
+    } catch (e) {
+      if (e instanceof RepositoryNotFoundError || e instanceof RepositoryRateLimitError || e instanceof RepositoryAccessError) {
+        throw e;
+      }
+      throw new RepositoryAccessError(`Failed to fetch tree: ${getErrorMessage(e)}`);
     }
-
-    const data = await res.json();
-    return data.tree
-      .filter((item: any) => item.type === 'blob')
-      .map((item: any) => ({
-        path: item.path,
-        size: item.size
-      }));
   }
 
   async readFile(path: string): Promise<string | null> {
@@ -91,13 +177,23 @@ export class GitHubPublicRepositoryProvider implements RepositoryProvider {
       await this.getMetadata();
     }
 
-    const res = await fetch(`https://raw.githubusercontent.com/${this.owner}/${this.repo}/${this.defaultBranch}/${path}`);
-    
-    if (!res.ok) {
-      if (res.status === 404) return null;
-      throw new Error(`Failed to read file ${path}: ${res.statusText}`);
-    }
+    try {
+      const res = await fetch(`https://raw.githubusercontent.com/${this.owner}/${this.repo}/${this.defaultBranch}/${path}`);
+      
+      if (!res.ok) {
+        if (res.status === 404) return null;
+        if (res.status === 403 || res.status === 429) {
+          throw new RepositoryRateLimitError('GitHub API rate limit reached while reading file.');
+        }
+        throw new RepositoryAccessError(`Failed to read file ${path}: HTTP ${res.status}`);
+      }
 
-    return await res.text();
+      return await res.text();
+    } catch (e) {
+      if (e instanceof RepositoryRateLimitError || e instanceof RepositoryAccessError) {
+        throw e;
+      }
+      throw new RepositoryAccessError(`Failed to read file ${path}: ${getErrorMessage(e)}`);
+    }
   }
 }

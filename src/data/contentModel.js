@@ -1,5 +1,29 @@
 export const tools = [
   {
+    slug: 'project-doctor',
+    id: 'project-doctor',
+    name: 'Project Doctor',
+    shortDescription: 'Project intelligence and shipping layer for AI-assisted developers.',
+    longDescription: 'Paste your repository. DevsHub understands it. Finds what is wrong. Explains why. Generates the fix. Prepares the context for your coding agent.',
+    icon: 'Activity',
+    status: 'beta',
+    category: 'Project Intelligence',
+    tags: ['Architecture', 'Health', 'Agents'],
+    supportedStacks: ['Node.js', 'Python', 'GitHub', 'GitLab'],
+    seoTitle: 'Project Doctor — Vibe code fast. We make sure it actually ships.',
+    seoDescription: 'Paste your repository. Find out what is wrong, why, and how to fix it.',
+    features: [
+      'Architecture Discovery',
+      'Rules Engine Evaluation',
+      'Evidence-based Health Score',
+      'Agent Context Generation'
+    ],
+    faqs: [
+      { q: 'What does Project Doctor do?', a: 'It analyzes your repository to find architecture, security, CI/CD, and quality issues.' }
+    ],
+    relatedTools: ['pipeline-architect', 'osv-dependency-scanner']
+  },
+  {
     slug: 'pipeline-architect',
     id: 'cicd-builder',
     name: 'CI/CD Pipeline Architect',
@@ -22,7 +46,7 @@ export const tools = [
       { q: 'What does Pipeline Architect do?', a: 'It visually generates robust, production-ready CI/CD pipelines based on your stack.' },
       { q: 'How does Pipeline Health Score work?', a: 'It evaluates your pipeline against best practices like caching, security scanning, and step timeouts.' }
     ],
-    relatedTools: ['osv-dependency-scanner']
+    relatedTools: ['osv-dependency-scanner', 'project-doctor']
   },
   {
     slug: 'osv-dependency-scanner',

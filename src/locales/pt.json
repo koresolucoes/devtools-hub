@@ -33,7 +33,7 @@
     },
     "alert": {
       "title": "URGENTE: Ataque de Supply Chain NPM \"ChainDrop\"",
-      "text": "Um worm massivo de auto-propagação comprometeu mais de 440 pacotes npm, incluindo a popular biblioteca <strong>keyv</strong>. O malware usa hooks de preinstall para extrair credenciais (npm, GitHub, AWS). Use nosso Scanner de Dependências imediatamente para verificar seus ambientes locais.",
+      "text": "Um worm massivo de auto-propagação comprometeu mais de 4000 pacotes npm, incluindo a popular biblioteca <strong>keyv</strong>. O malware usa hooks de preinstall para extrair credenciais (npm, GitHub, AWS). Use nosso Scanner de Dependências imediatamente para verificar seus ambientes locais.",
       "button": "Escaneie seu package.json Agora"
     }
   },

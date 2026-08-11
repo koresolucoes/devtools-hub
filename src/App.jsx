@@ -5,6 +5,7 @@ import OsvScanner from './pages/OsvScanner';
 import RagSandbox from './pages/RagSandbox';
 import TokenEstimator from './pages/TokenEstimator';
 import PipelineArchitect from './pages/PipelineArchitect';
+import ProjectDoctor from './pages/ProjectDoctor';
 import GuideDetail from './pages/GuideDetail';
 import TemplateDetail from './pages/TemplateDetail';
 import BriefingDetail from './pages/BriefingDetail';
@@ -29,6 +30,7 @@ function App() {
           <Route path="tools/rag-chunking-sandbox" element={<RagSandbox />} />
           <Route path="tools/token-estimator" element={<TokenEstimator />} />
           <Route path="tools/pipeline-architect" element={<PipelineArchitect />} />
+          <Route path="tools/project-doctor" element={<ProjectDoctor />} />
 
           {/* Knowledge Graph Routes */}
           <Route path="guides" element={<GuidesIndex />} />

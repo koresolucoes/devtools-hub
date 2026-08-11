@@ -33,7 +33,7 @@
     },
     "alert": {
       "title": "URGENT: \"ChainDrop\" NPM Supply Chain Attack",
-      "text": "A massive self-propagating worm has compromised over 440 npm packages, including the popular <strong>keyv</strong> library. The malware uses preinstall hooks to exfiltrate credentials (npm, GitHub, AWS). Use our Dependency Scanner immediately to verify your local environments.",
+      "text": "A massive self-propagating worm has compromised over 4000 npm packages, including the popular <strong>keyv</strong> library. The malware uses preinstall hooks to exfiltrate credentials (npm, GitHub, AWS). Use our Dependency Scanner immediately to verify your local environments.",
       "button": "Scan Your package.json Now"
     }
   },

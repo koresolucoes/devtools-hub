@@ -23,7 +23,8 @@ export const MODEL_REGISTRY: Record<string, AIModel> = {
     contextWindow: 128000,
     currency: 'USD',
     verifiedAt: null,
-    status: 'unverified'
+    status: 'unverified',
+    source: 'https://openai.com/api/pricing/'
   },
   gpt4oMini: {
     id: 'gpt-4o-mini',
@@ -35,7 +36,8 @@ export const MODEL_REGISTRY: Record<string, AIModel> = {
     contextWindow: 128000,
     currency: 'USD',
     verifiedAt: '2026-08-01',
-    status: 'verified'
+    status: 'verified',
+    source: 'https://openai.com/api/pricing/'
   },
   claude35Sonnet: {
     id: 'claude-3-5-sonnet-20240620',
@@ -47,7 +49,8 @@ export const MODEL_REGISTRY: Record<string, AIModel> = {
     contextWindow: 200000,
     currency: 'USD',
     verifiedAt: '2026-08-01',
-    status: 'verified'
+    status: 'verified',
+    source: 'https://www.anthropic.com/pricing'
   },
   claude3Haiku: {
     id: 'claude-3-haiku-20240307',
@@ -59,6 +62,7 @@ export const MODEL_REGISTRY: Record<string, AIModel> = {
     contextWindow: 200000,
     currency: 'USD',
     verifiedAt: '2026-08-01',
-    status: 'verified'
+    status: 'verified',
+    source: 'https://www.anthropic.com/pricing'
   }
 };

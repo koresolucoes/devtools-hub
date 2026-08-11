@@ -15,19 +15,19 @@
 - [x] Ensure Cmd/Ctrl + K (Command Palette) works globally.
 
 ## Milestone 1 — ProjectIR
-- [~] Create `src/core/project/types.ts` and `createProjectIR.ts`.
+- `[x]` Create `src/core/project/types.ts` and `createProjectIR.ts`.
 
 ## Milestone 2 — Repository Analyzer
-- [~] Create `repositoryAnalyzer.ts` and stack detectors (node, python, docker, etc.).
+- `[x]` Create `repositoryAnalyzer.ts` and stack detectors (node, python, docker, etc.).
 
 ## Milestone 3 — Rules Engine
-- [~] Implement `src/core/rules/` with initial rule packs (CI, Build, Security, Quality).
+- `[x]` Implement `src/core/rules/` with initial rule packs (CI, Build, Security, Quality).
 
 ## Milestone 4 — Project Health Score
-- [ ] Implement `src/core/scoring/projectHealth.ts`.
+- `[x]` Implement `src/core/scoring/projectHealth.ts`.
 
 ## Milestone 5 — Project Doctor UI MVP
-- [ ] Create public GitHub repo adapter.
+- `[x]` Create public GitHub repo adapter.
 - [ ] Build `/project-doctor` page with findings and score UI.
 
 ## Milestone 6 — Remediation Engine

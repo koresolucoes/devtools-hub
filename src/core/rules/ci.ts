@@ -63,7 +63,34 @@ export const CI003: Rule = {
   description: 'GitHub Actions workflow lacks concurrency cancellation for redundant runs.',
   severity: 'low',
   category: 'ci',
-  evaluate: (_ir: ProjectIR): Finding | null => {
+  evaluate: (ir: ProjectIR): Finding | null => {
+    const ghActions = ir.infrastructure.ci.find(c => c.provider === 'github_actions');
+    if (ghActions && !ghActions.hasConcurrency) {
+      return {
+        id: `CI003-${Date.now()}`,
+        ruleId: 'CI003',
+        title: 'Missing Concurrency Cancellation',
+        description: 'GitHub Actions workflow lacks concurrency configuration for redundant runs.',
+        severity: 'low',
+        category: 'ci',
+        confidence: 'high',
+        impact: 'Wastes CI minutes and slows down development by running redundant jobs when new commits are pushed.',
+        evidence: [{
+          source: 'ProjectIR',
+          message: 'No concurrency block found in GitHub Actions workflows.'
+        }],
+        remediation: {
+          summary: 'Add a concurrency block to your GitHub Actions workflow.',
+          type: 'workflow-change',
+          affectedFiles: ghActions.workflows,
+          instructions: [
+            'Add concurrency group based on branch/PR reference.',
+            'Enable cancel-in-progress to stop redundant runs.'
+          ],
+          verification: ['Push multiple commits rapidly to a PR and verify only the latest run continues.']
+        }
+      };
+    }
     return null;
   }
 };
