@@ -1,7 +1,10 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, Terminal, Search, Globe } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useState, useEffect } from 'react';
 import CookieBanner from './CookieBanner';
+import CommandPalette from './CommandPalette';
+import SnippetModal from './SnippetModal';
 import '../index.css';
 
 function Layout() {
@@ -15,6 +18,20 @@ function Layout() {
     const nextLang = langs[(currentIndex + 1) % langs.length] || 'en';
     i18n.changeLanguage(nextLang);
   };
+
+  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
+  const [activeSnippet, setActiveSnippet] = useState(null);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandPaletteOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, []);
 
   return (
     <div className="layout">
@@ -36,12 +53,15 @@ function Layout() {
         </div>
 
         <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
+          <div 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)', fontSize: '0.875rem', cursor: 'pointer' }}
+            onClick={() => setIsCommandPaletteOpen(true)}
+          >
             <Search size={16} />
             <span style={{ fontFamily: 'monospace', background: 'var(--surface-bg)', border: '1px solid var(--surface-border)', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>⌘ K</span>
           </div>
 
-          <a href="https://github.com" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', display: 'flex' }}>
+          <a href="https://github.com/Koresolucoes/devtools-hub" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', display: 'flex' }}>
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.02c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A4.8 4.8 0 0 0 8 18v4"></path></svg>
           </a>
 
@@ -124,6 +144,16 @@ function Layout() {
         </div>
       </footer>
       <CookieBanner />
+      
+      <SnippetModal 
+        snippetId={activeSnippet} 
+        onClose={() => setActiveSnippet(null)} 
+      />
+      <CommandPalette 
+        isOpen={isCommandPaletteOpen}
+        onClose={() => setIsCommandPaletteOpen(false)}
+        onSnippetSelect={(id) => { setIsCommandPaletteOpen(false); setActiveSnippet(id); }}
+      />
     </div>
   );
 }

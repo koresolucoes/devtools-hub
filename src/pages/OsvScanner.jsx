@@ -19,8 +19,8 @@ function OsvScanner() {
     try {
       setAppState('scanning');
       
-      const deps = extractDependencies(jsonContent);
-      const depCount = Object.keys(deps).length;
+      const deps = extractDependencies(jsonContent, fileName);
+      const depCount = deps.length;
       
       if (depCount === 0) {
         throw new Error('No valid dependencies found in the file.');

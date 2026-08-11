@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom';
 import { ShieldAlert, ArrowRight, Search, BookOpen, Box, Flag, Plug, Baseline, BrainCircuit } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import TechFeed from '../components/TechFeed';
-import SnippetModal from '../components/SnippetModal';
-import CommandPalette from '../components/CommandPalette';
 import { tools, guides, templates } from '../data/contentModel';
 import '../index.css';
 
@@ -20,8 +18,6 @@ const getIcon = (slug) => {
 
 function Hub() {
   const { t } = useTranslation();
-  const [activeSnippet, setActiveSnippet] = useState(null);
-  const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   
   const featuredToolSlug = 'pipeline-architect';
   const featuredTool = tools.find(t => t.slug === featuredToolSlug);
@@ -43,7 +39,7 @@ function Hub() {
           <input 
             type="text" 
             placeholder={t('hub.search', 'Search tools, snippets or commands...')} 
-            onClick={() => setIsCommandPaletteOpen(true)}
+            onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))}
             readOnly
           />
           <div className="search-bar-hero-shortcut">⌘ K</div>
@@ -196,16 +192,6 @@ function Hub() {
         <TechFeed />
 
       </div>
-
-      <SnippetModal 
-        snippetId={activeSnippet} 
-        onClose={() => setActiveSnippet(null)} 
-      />
-      <CommandPalette 
-        isOpen={isCommandPaletteOpen}
-        onClose={() => setIsCommandPaletteOpen(false)}
-        onSnippetSelect={(id) => { setIsCommandPaletteOpen(false); setActiveSnippet(id); }}
-      />
     </div>
   );
 }

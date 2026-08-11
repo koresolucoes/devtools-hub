@@ -22,20 +22,15 @@ export default function FileUpload({ onFileUpload }) {
     setError(null);
     if (!file) return;
     
-    // Only accept JSON
-    if (file.type !== 'application/json' && !file.name.endsWith('.json')) {
-      setError('Por favor, selecione um arquivo JSON (package.json ou package-lock.json).');
+    // Accept JSON, YAML, TOML, TXT
+    if (!file.name.match(/\.(json|yaml|yml|toml|txt)$/) && file.name !== 'Pipfile') {
+      setError('Por favor, selecione um arquivo suportado (package.json, lockfiles, requirements.txt, etc).');
       return;
     }
 
     const reader = new FileReader();
     reader.onload = (e) => {
-      try {
-        const content = JSON.parse(e.target.result);
-        onFileUpload(content, file.name);
-      } catch (err) {
-        setError('O arquivo selecionado não é um JSON válido.');
-      }
+      onFileUpload(e.target.result, file.name);
     };
     reader.onerror = () => {
       setError('Erro ao ler o arquivo.');
@@ -107,8 +102,8 @@ export default function FileUpload({ onFileUpload }) {
         throw new Error('Não foi possível encontrar o package.json na branch main ou master deste repositório.');
       }
 
-      const jsonContent = await res.json();
-      onFileUpload(jsonContent, `github:${owner}/${repo}`);
+      const textContent = await res.text();
+      onFileUpload(textContent, 'package.json');
     } catch (err) {
       console.error(err);
       setError(err.message || 'Erro ao buscar dados do GitHub.');

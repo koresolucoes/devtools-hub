@@ -421,7 +421,7 @@ function PipelineArchitect() {
                   <button className="button outline w-100" style={{ border: 'none', justifyContent: 'flex-start', padding: '0.5rem' }} onClick={() => downloadFile('ci.yml', generatedYAML)}>Download workflow</button>
                   <div style={{ height: '1px', background: 'var(--surface-border)', margin: '0.25rem 0' }}></div>
                   <button className="button outline w-100" style={{ border: 'none', justifyContent: 'flex-start', padding: '0.5rem' }} onClick={() => copyToClipboard(`Update .github/workflows/ci.yml with the following:\n\n` + generatedYAML)}>Copy for Cursor</button>
-                  <button className="button outline w-100" style={{ border: 'none', justifyContent: 'flex-start', padding: '0.5rem' }} onClick={() => copyToClipboard(gitlabYAML)}>Convert to GitLab CI</button>
+                  <button className="button outline w-100" style={{ border: 'none', justifyContent: 'flex-start', padding: '0.5rem' }} onClick={() => copyToClipboard(gitlabYAML)}>Convert to GitLab CI (Preview)</button>
                 </div>
               )}
             </div>

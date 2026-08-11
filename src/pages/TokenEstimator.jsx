@@ -3,6 +3,7 @@ import { Baseline, Cpu, Calculator, DollarSign, ArrowRight } from 'lucide-react'
 import { encode } from 'gpt-tokenizer';
 import { Link } from 'react-router-dom';
 import { tools } from '../data/contentModel';
+import { MODEL_REGISTRY } from '../core/registries/models';
 import '../index.css';
 
 function TokenEstimator() {
@@ -11,8 +12,9 @@ function TokenEstimator() {
   const [tokenCount, setTokenCount] = useState(0);
   const [charCount, setCharCount] = useState(0);
 
-  // GPT-4o Pricing (approximate, e.g. $5.00 per 1M input tokens)
-  const PRICE_PER_1M_TOKENS = 5.00; 
+  const [selectedModel, setSelectedModel] = useState('gpt4o');
+  const activeModel = MODEL_REGISTRY[selectedModel];
+  const PRICE_PER_1M_TOKENS = activeModel.inputPricePerMillion;
 
   useEffect(() => {
     setCharCount(prompt.length);
@@ -70,7 +72,7 @@ function TokenEstimator() {
           <div className="stat-box">
             <DollarSign size={24} />
             <div>
-              <h4>Estimated Cost (GPT-4o Input)</h4>
+              <h4>Estimated Cost ({activeModel.name} Input)</h4>
               <span className="stat-value">${estimatedCost}</span>
             </div>
           </div>
@@ -85,8 +87,11 @@ function TokenEstimator() {
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="Paste your System Prompt, RAG chunks, or large context here to analyze..."
           />
-          <div className="stats-bar mt-2">
-            <span>Default tokenizer used is cl100k_base (GPT-3.5/GPT-4 family).</span>
+          <div className="stats-bar mt-2" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Tokenizer: {activeModel.tokenizer} | Pricing verified: {activeModel.verifiedAt}</span>
+            <select className="text-input" value={selectedModel} onChange={e => setSelectedModel(e.target.value)} style={{ padding: '0.4rem', width: '200px' }}>
+              {Object.entries(MODEL_REGISTRY).map(([k, m]) => <option key={k} value={k}>{m.name}</option>)}
+            </select>
           </div>
         </div>
       </section>

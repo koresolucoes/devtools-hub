@@ -1,60 +1,68 @@
 // OSV API endpoint
 const OSV_API_URL = 'https://api.osv.dev/v1/querybatch';
 
-/**
- * Extracts dependencies from package.json or package-lock.json
- */
-export function extractDependencies(jsonContent) {
-  const deps = {};
+export function extractDependencies(textContent, fileName = 'package.json') {
+  const deps = [];
   
-  if (jsonContent.dependencies) {
-    Object.assign(deps, jsonContent.dependencies);
+  let ecosystem = 'npm';
+  if (fileName.includes('requirements.txt') || fileName.includes('pyproject.toml') || fileName.includes('Pipfile')) {
+    ecosystem = 'PyPI';
+  } else if (fileName.includes('composer.json') || fileName.includes('composer.lock')) {
+    ecosystem = 'Packagist';
+  } else if (fileName.includes('Gemfile')) {
+    ecosystem = 'RubyGems';
   }
-  if (jsonContent.devDependencies) {
-    Object.assign(deps, jsonContent.devDependencies);
-  }
-  
-  // For package-lock.json v2/v3
-  if (jsonContent.packages) {
-    for (const [path, pkg] of Object.entries(jsonContent.packages)) {
-      if (path && pkg.name && pkg.version) {
-        deps[pkg.name] = pkg.version;
+
+  if (fileName.endsWith('.json')) {
+    try {
+      const jsonContent = JSON.parse(textContent);
+      const rawDeps = {};
+      if (jsonContent.dependencies) Object.assign(rawDeps, jsonContent.dependencies);
+      if (jsonContent.devDependencies) Object.assign(rawDeps, jsonContent.devDependencies);
+      
+      if (jsonContent.packages) {
+        for (const [path, pkg] of Object.entries(jsonContent.packages)) {
+          if (path && pkg.name && pkg.version) rawDeps[pkg.name] = pkg.version;
+        }
+      } else if (jsonContent.dependencies && jsonContent.lockfileVersion) {
+        for (const [name, pkg] of Object.entries(jsonContent.dependencies)) {
+          rawDeps[name] = pkg.version;
+        }
+      }
+
+      for (const [name, version] of Object.entries(rawDeps)) {
+        const cleanMatch = version.match(/(\d+\.\d+\.\d+)/);
+        const cleanVersion = cleanMatch ? cleanMatch[1] : version.replace(/[\^~>=<]/g, '').trim();
+        if (name && cleanVersion) deps.push({ name, version: cleanVersion, ecosystem });
+      }
+    } catch(e) {
+      console.error('Invalid JSON', e);
+    }
+  } else if (fileName.includes('requirements.txt')) {
+    const lines = textContent.split('\n');
+    for (const line of lines) {
+      const cleanLine = line.split('#')[0].trim();
+      if (!cleanLine) continue;
+      const match = cleanLine.match(/^([a-zA-Z0-9_\-]+).*?([0-9\.]+)$/);
+      if (match) {
+        deps.push({ name: match[1], version: match[2], ecosystem });
       }
     }
-  } else if (jsonContent.dependencies && jsonContent.lockfileVersion) {
-    // For package-lock.json v1
-    for (const [name, pkg] of Object.entries(jsonContent.dependencies)) {
-      deps[name] = pkg.version;
-    }
   }
 
-  // Clean up versions (remove ^, ~, >, etc.)
-  const cleanedDeps = {};
-  for (const [name, version] of Object.entries(deps)) {
-    // Basic regex to strip semver ranges, keeping the base version
-    // E.g., "^1.2.3" -> "1.2.3", "~1.2.x" -> "1.2.0" (simple fallback)
-    const cleanMatch = version.match(/(\d+\.\d+\.\d+)/);
-    if (cleanMatch) {
-      cleanedDeps[name] = cleanMatch[1];
-    } else {
-      // If we can't parse it easily (like a git url), we might skip or keep as is
-      cleanedDeps[name] = version.replace(/[\^~]/g, '');
-    }
-  }
-
-  return cleanedDeps;
+  return deps;
 }
 
 /**
  * Scan dependencies against OSV database
  */
 export async function scanDependencies(dependencies) {
-  const queries = Object.entries(dependencies).map(([name, version]) => ({
+  const queries = dependencies.map(dep => ({
     package: {
-      name,
-      ecosystem: 'npm'
+      name: dep.name,
+      ecosystem: dep.ecosystem
     },
-    version
+    version: dep.version
   }));
 
   // OSV limits batch size, usually 1000 is safe. We'll batch in chunks of 500 just in case.
@@ -117,18 +125,14 @@ export async function scanDependencies(dependencies) {
  */
 function formatVulnerabilities(rawResults) {
   return rawResults.map(result => {
-    // Determine highest severity
-    let maxSeverity = 'LOW';
-    const severityScores = { 'CRITICAL': 4, 'HIGH': 3, 'MODERATE': 2, 'MEDIUM': 2, 'LOW': 1 };
+    let maxSeverity = 'UNKNOWN';
+    const severityScores = { 'CRITICAL': 5, 'HIGH': 4, 'MODERATE': 3, 'MEDIUM': 3, 'LOW': 2, 'UNKNOWN': 1 };
     
     result.vulns.forEach(vuln => {
-      // Look for CVSS score in database_specific or severity
       if (vuln.severity) {
         const cvss = vuln.severity.find(s => s.type === 'CVSS_V3');
         if (cvss) {
-          // Parse score from vector if needed, or use severity type if available
-          // (Simplified for this MVP)
-          const scoreMatch = cvss.score.match(/CVSS:3.\d\/.*?\/.*?(?:[A-Z]:[A-Z]+\/)*.*?/); // complex, better to rely on database_specific if present
+          const scoreMatch = cvss.score.match(/CVSS:3.\d\/.*?\/.*?(?:[A-Z]:[A-Z]+\/)*.*?/);
         }
       }
       
@@ -138,8 +142,10 @@ function formatVulnerabilities(rawResults) {
           maxSeverity = sev;
         }
       } else {
-        // Fallback default
-        maxSeverity = 'HIGH'; 
+        // Keeps UNKNOWN if no specific severity found
+        if (severityScores['UNKNOWN'] > severityScores[maxSeverity]) {
+          maxSeverity = 'UNKNOWN';
+        }
       }
     });
 
