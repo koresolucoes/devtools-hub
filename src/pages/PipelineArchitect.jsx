@@ -384,5 +384,3 @@ export default function PipelineArchitect() {
     </div>
   );
 }
-
-export default PipelineArchitect;
