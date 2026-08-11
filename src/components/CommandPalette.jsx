@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Plug, Flag, ShieldAlert, BrainCircuit, Baseline, GitBranch, Database, Server, X } from 'lucide-react';
+import { Search, Plug, Flag, ShieldAlert, BrainCircuit, Baseline, BookOpen, Box, GitBranch, Database, Server, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { tools, guides, templates } from '../data/contentModel';
 
 export default function CommandPalette({ isOpen, onClose, onSnippetSelect }) {
   const { t } = useTranslation();
@@ -10,12 +11,20 @@ export default function CommandPalette({ isOpen, onClose, onSnippetSelect }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef(null);
   
+  const getIcon = (slug) => {
+    switch(slug) {
+      case 'osv-dependency-scanner': return <ShieldAlert size={16} />;
+      case 'rag-chunking-sandbox': return <BrainCircuit size={16} />;
+      case 'token-estimator': return <Baseline size={16} />;
+      case 'pipeline-architect': return <Plug size={16} />;
+      default: return <Flag size={16} />;
+    }
+  };
+
   const items = [
-    { id: 'npm-verify', title: t('hub.tools.npm_verify.name', 'OSV Dependency Scanner'), type: 'Tool', path: '/npm-verify', icon: <ShieldAlert size={16} /> },
-    { id: 'rag-sandbox', title: t('hub.tools.rag_sandbox.name', 'RAG Chunking Sandbox'), type: 'Tool', path: '/rag-sandbox', icon: <BrainCircuit size={16} /> },
-    { id: 'token-estimator', title: t('hub.tools.token_estimator.name', 'Token Estimator & Pricing'), type: 'Tool', path: '/token-estimator', icon: <Baseline size={16} /> },
-    { id: 'cicd-builder', title: t('hub.tools.cicd_builder.name', 'Pipeline Architect'), type: 'Tool', path: '/cicd-builder', icon: <Plug size={16} /> },
-    { id: 'mcp-inspector', title: t('hub.tools.mcp_inspector.name', 'MCP Inspector'), type: 'Tool', path: '/mcp', icon: <Flag size={16} /> },
+    ...tools.map(t => ({ id: t.slug, title: t.name, type: 'Tool', path: `/tools/${t.slug}`, icon: getIcon(t.slug) })),
+    ...guides.map(g => ({ id: g.slug, title: g.title, type: 'Guide', path: `/guides/${g.slug}`, icon: <BookOpen size={16} /> })),
+    ...templates.map(tmp => ({ id: tmp.slug, title: tmp.title, type: 'Template', path: `/templates/${tmp.slug}`, icon: <Box size={16} /> })),
     
     // Snippets
     { id: 'node-multi-stage', title: 'Node 20 Multi-stage', type: 'Snippet', action: 'snippet', icon: <Server size={16} /> },
@@ -62,7 +71,7 @@ export default function CommandPalette({ isOpen, onClose, onSnippetSelect }) {
   }, [isOpen, filteredItems, selectedIndex, onClose]);
 
   const handleSelect = (item) => {
-    if (item.type === 'Tool') {
+    if (['Tool', 'Guide', 'Template'].includes(item.type)) {
       navigate(item.path);
     } else if (item.type === 'Snippet') {
       onSnippetSelect(item.id);

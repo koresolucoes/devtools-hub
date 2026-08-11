@@ -38,11 +38,23 @@
     }
   },
   "tech_feed": {
-    "trending_hn": "HN Top",
-    "trending_gh": "GH Trending",
-    "updated": "Atualizado às",
-    "refresh": "Recarregar",
-    "loading": "Carregando feed..."
+    "title": "DEVELOPER INTELLIGENCE",
+    "subtitle": "O que os desenvolvedores estão construindo, discutindo e entregando hoje.",
+    "todays_brief": "RESUMO DE HOJE",
+    "developer_intelligence": "Inteligência para Desenvolvedores",
+    "github_projects": "projetos no GitHub",
+    "hn_stories": "histórias no HN",
+    "signals_analyzed": "sinais analisados",
+    "read_briefing": "Ler o resumo de hoje",
+    "github_trending": "Em Alta no GitHub",
+    "hacker_news": "Hacker News",
+    "trending": "Em Alta #",
+    "pts": "pts",
+    "comments": "comentários",
+    "view_all_trending": "Ver todos em alta",
+    "view_hn": "Ver Hacker News",
+    "loading": "Carregando...",
+    "fallback_desc": "Repositório em alta no GitHub."
   },
   "snippets": {
     "title": "Quick Snippets",

@@ -76,7 +76,7 @@ body {
   color: var(--text-secondary);
   text-decoration: none;
   font-size: 0.9rem;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
 .nav-links a:hover {
@@ -96,7 +96,7 @@ main {
   background: var(--surface-bg);
   border: 1px solid var(--surface-border);
   border-radius: var(--radius-lg);
-  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.15s ease;
 }
 
 .card:hover {
@@ -114,7 +114,7 @@ main {
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   text-decoration: none;
   border: 1px solid transparent;
 }
@@ -283,7 +283,7 @@ p {
   color: var(--text-secondary);
   font-size: 0.875rem;
   font-weight: 500;
-  transition: color 0.2s;
+  transition: color 0.15s;
 }
 
 .tool-card:hover .tool-card-action {
@@ -409,7 +409,7 @@ p {
   border-radius: 20px;
   font-size: 0.75rem;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 
 .category-chip:hover {
@@ -434,7 +434,7 @@ p {
   padding: 1rem 1rem 1rem 3rem;
   color: var(--text-primary);
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.15s;
 }
 
 .search-bar-hero input:focus {
@@ -503,7 +503,7 @@ p {
   border-radius: var(--radius-md);
   font-family: var(--font-sans);
   font-size: 0.875rem;
-  transition: border-color 0.2s;
+  transition: border-color 0.15s;
 }
 
 .text-input:focus, .select-input:focus {
@@ -666,7 +666,7 @@ p {
   padding: 0.75rem;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   font-size: 0.875rem;
 }
 
@@ -742,7 +742,7 @@ p {
   padding: 4rem 2rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
   background: var(--bg-color);
 }
 
@@ -906,7 +906,7 @@ p {
   padding: 0.5rem 1rem;
   border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.15s ease;
 }
 
 .pagination button:hover:not(:disabled) {
@@ -970,7 +970,7 @@ p {
   text-decoration: none;
   font-size: 0.875rem;
   border-radius: var(--radius-md);
-  transition: background 0.2s;
+  transition: background 0.15s;
 }
 
 .snippet-link:hover {
@@ -1004,7 +1004,7 @@ p {
 .feed-item {
   padding: 1rem;
   border-bottom: 1px solid var(--surface-border);
-  transition: background 0.2s;
+  transition: background 0.15s;
 }
 
 .feed-item:last-child {
@@ -1049,7 +1049,7 @@ p {
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  animation: fadeIn 0.2s ease-out;
+  animation: fadeIn 0.15s ease-out;
 }
 
 .modal-content {

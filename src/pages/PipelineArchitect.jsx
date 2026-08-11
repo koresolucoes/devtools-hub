@@ -34,10 +34,13 @@ import {
   explainPipeline,
   validatePipeline
 } from '../utils/pipelineIR';
+import { tools } from '../data/contentModel';
+import { Link } from 'react-router-dom';
 import '../index.css';
 import { motion } from 'framer-motion';
 
-function CICDBuilder() {
+function PipelineArchitect() {
+  const toolData = tools.find(t => t.slug === 'pipeline-architect');
   const [activeMode, setActiveMode] = useState('builder'); // 'vibe' | 'builder' | 'pro'
   const [activeTab, setActiveTab] = useState('yaml'); // 'yaml' | 'graph' | 'secrets' | 'explain'
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
@@ -146,8 +149,24 @@ function CICDBuilder() {
   };
   const removeEnvVar = (i) => setConfig({ ...config, envVars: config.envVars.filter((_, idx) => idx !== i) });
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": toolData.name,
+    "applicationCategory": "DeveloperApplication",
+    "description": toolData.seoDescription,
+    "offers": {
+      "@type": "Offer",
+      "price": "0"
+    }
+  };
+
   return (
-    <div className="tool-container" style={{ maxWidth: '1350px' }}>
+    <div className="tool-container" style={{ maxWidth: '1350px', margin: '0 auto', padding: '0 1rem' }}>
+      <title>{toolData.seoTitle}</title>
+      <meta name="description" content={toolData.seoDescription} />
+      <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+
       
       <header className="header" style={{ marginBottom: '1rem', marginTop: '0.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
@@ -461,8 +480,61 @@ function CICDBuilder() {
 
         </div>
       </div>
+
+      {/* AEO & SEO Semantic Content */}
+      <article className="tool-semantic-content" style={{ marginTop: '5rem', borderTop: '1px solid var(--surface-border)', paddingTop: '3rem', color: 'var(--text-secondary)' }}>
+        <h2 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>What does {toolData.name} do?</h2>
+        <p style={{ marginBottom: '2rem', lineHeight: '1.6' }}>{toolData.longDescription}</p>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+          <div>
+            <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Supported Stacks</h3>
+            <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.6' }}>
+              {toolData.supportedStacks.map(stack => <li key={stack}>{stack}</li>)}
+            </ul>
+          </div>
+          
+          <div>
+            <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Key Features</h3>
+            <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.6' }}>
+              {toolData.features.map(feat => <li key={feat}>{feat}</li>)}
+            </ul>
+          </div>
+        </div>
+
+        {toolData.faqs && toolData.faqs.length > 0 && (
+          <section style={{ marginBottom: '3rem' }}>
+            <h2 style={{ color: 'var(--text-primary)', marginBottom: '1.5rem' }}>Frequently Asked Questions</h2>
+            {toolData.faqs.map((faq, idx) => (
+              <div key={idx} style={{ marginBottom: '1.5rem' }}>
+                <h4 style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>{faq.q}</h4>
+                <p>{faq.a}</p>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {toolData.relatedTools && toolData.relatedTools.length > 0 && (
+          <section style={{ marginBottom: '3rem' }}>
+            <h2 style={{ color: 'var(--text-primary)', marginBottom: '1.5rem' }}>Related Tools</h2>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              {toolData.relatedTools.map(slug => {
+                const rt = tools.find(t => t.slug === slug);
+                if (!rt) return null;
+                return (
+                  <Link key={slug} to={`/tools/${slug}`} className="card" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '1rem 1.5rem' }}>
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{rt.name}</span>
+                    <ArrowRight size={16} />
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+      </article>
+
     </div>
   );
 }
 
-export default CICDBuilder;
+export default PipelineArchitect;

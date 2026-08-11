@@ -1,0 +1,44 @@
+{
+  "layout": {
+    "back_to_hub": "Volver al Hub"
+  },
+  "hub": {
+    "title": "Build fast. Ship like an engineer.",
+    "subtitle": "Herramientas de DevOps, AI y arquitectura hechas para vibecoders.",
+    "search": "Buscar herramientas, snippets o comandos...",
+    "security_alert": "ALERTA DE SEGURIDAD",
+    "security_text": "Ataque de supply-chain en NPM afectando a 40 paquetes.",
+    "security_button": "Ver paquetes afectados",
+    "featured_tool": "HERRAMIENTA DESTACADA",
+    "featured_action": "Abrir Herramienta",
+    "all_tools": "TODAS LAS HERRAMIENTAS",
+    "latest_guides": "ÚLTIMAS GUÍAS",
+    "popular_templates": "PLANTILLAS POPULARES",
+    "open_tool": "Abrir herramienta",
+    "coming_soon": "Próximamente",
+    "soon": "Pronto"
+  },
+  "tech_feed": {
+    "title": "INTELIGENCIA PARA DESARROLLADORES",
+    "subtitle": "Lo que los desarrolladores están construyendo, debatiendo y enviando hoy.",
+    "todays_brief": "RESUMEN DE HOY",
+    "developer_intelligence": "Inteligencia para Desarrolladores",
+    "github_projects": "proyectos en GitHub",
+    "hn_stories": "historias en HN",
+    "signals_analyzed": "señales analizadas",
+    "read_briefing": "Leer el resumen de hoy",
+    "github_trending": "Tendencias en GitHub",
+    "hacker_news": "Hacker News",
+    "trending": "Tendencia #",
+    "pts": "pts",
+    "comments": "comentarios",
+    "view_all_trending": "Ver todas las tendencias",
+    "view_hn": "Ver Hacker News",
+    "loading": "Cargando...",
+    "fallback_desc": "Repositorio en tendencia en GitHub."
+  },
+  "snippets": {
+    "title": "Quick Snippets",
+    "copy": "Copiar código"
+  }
+}

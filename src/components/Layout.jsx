@@ -9,7 +9,9 @@ function Layout() {
   const isHub = location.pathname === '/';
 
   const toggleLanguage = () => {
-    const nextLang = i18n.language.startsWith('en') ? 'pt' : 'en';
+    const langs = ['en', 'pt', 'es'];
+    const currentIndex = langs.findIndex(l => i18n.language.startsWith(l));
+    const nextLang = langs[(currentIndex + 1) % langs.length] || 'en';
     i18n.changeLanguage(nextLang);
   };
 
@@ -64,14 +66,58 @@ function Layout() {
       </main>
 
       <footer style={{
-        padding: '2rem',
-        textAlign: 'center',
+        background: 'var(--surface-bg)',
         borderTop: '1px solid var(--surface-border)',
-        color: 'var(--text-secondary)',
-        fontSize: '0.875rem',
+        padding: '4rem 2rem 2rem',
         marginTop: 'auto'
       }}>
-        © {new Date().getFullYear()} DevsHub. Built by Kore Soluções.
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '3rem', marginBottom: '3rem' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-primary)', fontWeight: 'bold', marginBottom: '1rem', fontSize: '1.1rem' }}>
+                <Terminal size={18} /> DevsHub
+              </div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6' }}>
+                Tools, templates, and intelligence for developers who want to build fast and ship like engineers.
+              </p>
+            </div>
+            
+            <div>
+              <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Developer Tools</h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <li><Link to="/tools/pipeline-architect" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Pipeline Architect</Link></li>
+                <li><Link to="/tools/osv-dependency-scanner" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>OSV Dependency Scanner</Link></li>
+                <li><Link to="/tools/rag-chunking-sandbox" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>RAG Sandbox</Link></li>
+                <li><Link to="/tools/token-estimator" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Token Estimator</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('layout.footer.resources', 'Resources')}</h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <li><Link to="/guides" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>{t('layout.footer.guides', 'Guides & Tutorials')}</Link></li>
+                <li><Link to="/templates" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>{t('layout.footer.templates', 'Architecture Templates')}</Link></li>
+                <li><Link to="/briefing" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>{t('layout.footer.briefing', 'Developer Intelligence')}</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('layout.footer.about', 'About')}</h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <li><a href="https://github.com/Koresolucoes" target="_blank" rel="noreferrer" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>GitHub</a></li>
+                <li><span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{t('layout.footer.built_by', 'Built by Kore Soluções')}</span></li>
+              </ul>
+            </div>
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '2rem', borderTop: '1px solid var(--surface-border)', color: 'var(--text-secondary)', fontSize: '0.8rem' }}>
+            <span>© {new Date().getFullYear()} DevsHub. {t('layout.footer.rights', 'All rights reserved.')}</span>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <Link to="/privacy" style={{ color: 'inherit', textDecoration: 'none' }}>{t('layout.footer.privacy', 'Privacy Policy')}</Link>
+              <Link to="/terms" style={{ color: 'inherit', textDecoration: 'none' }}>{t('layout.footer.terms', 'Terms of Service')}</Link>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );
