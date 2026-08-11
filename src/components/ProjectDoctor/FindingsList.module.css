@@ -208,3 +208,11 @@
   background: var(--primary);
   color: white;
 }
+
+@media (max-width: 768px) {
+  .findingHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}

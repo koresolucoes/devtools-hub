@@ -17,10 +17,10 @@ export const SECURITY001: Rule = {
     if (criticalOrHigh.length === 0) return null;
 
     const evidence: Evidence[] = criticalOrHigh.map(v => ({
-      type: 'content',
-      path: v.ecosystem === 'npm' ? 'package.json' : 'requirements.txt',
-      value: `${v.packageName}@${v.installedVersion} has ${v.severity.toUpperCase()} vulnerability: ${v.id}`,
-      line: 0
+      source: 'OSV Scanner',
+      file: v.ecosystem === 'npm' ? 'package.json' : 'requirements.txt',
+      message: `${v.packageName}@${v.installedVersion} has ${v.severity.toUpperCase()} vulnerability: ${v.id}`,
+      value: `${v.packageName}@${v.installedVersion}`
     }));
 
     const instructions = criticalOrHigh.map(v => 
@@ -42,7 +42,7 @@ export const SECURITY001: Rule = {
       remediation: {
         summary: 'Update the vulnerable dependencies to their patched versions.',
         type: 'dependency-change',
-        affectedFiles: [...new Set(evidence.map(e => e.path))],
+        affectedFiles: [...new Set(evidence.map(e => e.file).filter((f): f is string => !!f))],
         instructions,
         verification: [
           'Run `npm audit` or equivalent to verify dependencies.',
