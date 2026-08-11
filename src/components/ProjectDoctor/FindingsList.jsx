@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShieldAlert, AlertTriangle, Info, ArrowRight, Code, Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import styles from './FindingsList.module.css';
 
 const SeverityBadge = ({ severity = 'unknown' }) => {
@@ -25,6 +26,7 @@ const SeverityBadge = ({ severity = 'unknown' }) => {
 };
 
 const FindingCard = ({ finding }) => {
+  const { t } = useTranslation('project_doctor');
   const [copied, setCopied] = useState(false);
 
   const handleCopyAgentPrompt = () => {
@@ -91,13 +93,13 @@ ${remediationText}
       
       {finding.impact && (
         <div className={styles.impact}>
-          <strong>Impact:</strong> {finding.impact}
+          <strong>{t('impact', 'Impact')}:</strong> {finding.impact}
         </div>
       )}
 
       {finding.evidence && finding.evidence.length > 0 && (
         <div className={styles.evidenceContainer}>
-          <div className={styles.evidenceTitle}>Evidence</div>
+          <div className={styles.evidenceTitle}>{t('evidence', 'Evidence')}</div>
           <ul className={styles.evidenceList}>
             {finding.evidence.map((ev, idx) => (
               <li key={idx}>
@@ -114,12 +116,12 @@ ${remediationText}
       {finding.remediation && (
         <div className={styles.remediation}>
           <div className={styles.remediationHeader}>
-            <Code size={16} /> Suggested Fix
+            <Code size={16} /> {t('suggested_fix', 'Suggested Fix')}
           </div>
           {renderRemediation()}
           
           <button className={styles.exportAgentButton} onClick={handleCopyAgentPrompt}>
-            {copied ? <Check size={14} /> : 'Prepare for Coding Agent'}
+            {copied ? <Check size={14} /> : t('prepare_coding_agent', 'Prepare for Coding Agent')}
             {!copied && <ArrowRight size={14} />}
           </button>
         </div>
@@ -129,12 +131,13 @@ ${remediationText}
 };
 
 export default function FindingsList({ findings }) {
+  const { t } = useTranslation('project_doctor');
   if (!findings || findings.length === 0) {
     return (
       <div className={styles.emptyState}>
         <ShieldAlert size={48} className={styles.emptyIcon} />
-        <h3>No issues found!</h3>
-        <p>Your project is in great shape.</p>
+        <h3>{t('no_issues_found', 'No issues found!')}</h3>
+        <p>{t('project_in_great_shape', 'Your project is in great shape.')}</p>
       </div>
     );
   }

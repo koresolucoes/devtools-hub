@@ -80,7 +80,7 @@ export default function ProjectDoctor() {
       <header className={styles.header}>
         <div className={styles.hero}>
           <div className={styles.heroBadge}>
-            <Activity size={16} /> DevsHub Project Doctor
+            <Activity size={16} /> {t('translation.hub.tools.project_doctor.name', 'DevsHub Project Doctor')}
           </div>
           <div className={styles.heroContent}>
             <h1 className={styles.title}>{t('title')}</h1>
@@ -108,12 +108,12 @@ export default function ProjectDoctor() {
               onClick={() => handleAnalyze(url)}
               disabled={!url || status === 'ANALYZING'}
             >
-              {status === 'ANALYZING' ? <RefreshCcw className="spin" size={18} /> : 'Analyze'}
+              {status === 'ANALYZING' ? <RefreshCcw className="spin" size={18} /> : t('analyze_button')}
               {status !== 'ANALYZING' && <ArrowRight size={18} />}
             </button>
           </div>
           <p className={styles.privacyNotice}>
-            <ShieldAlert size={14} /> Analysis runs securely in your browser. No code is stored.
+            <ShieldAlert size={14} /> {t('privacy_notice', 'Analysis runs securely in your browser. No code is stored.')}
           </p>
         </div>
       </header>

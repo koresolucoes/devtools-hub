@@ -155,7 +155,14 @@
     "deployment_readiness": "Preparación para Despliegue",
     "ci_cd": "CI / CD",
     "findings": "Hallazgos",
-    "architecture_stack": "Stack de Arquitectura"
+    "architecture_stack": "Stack de Arquitectura",
+    "privacy_notice": "El análisis se ejecuta de forma segura en su navegador. No se almacena código.",
+    "impact": "Impacto",
+    "evidence": "Evidencia",
+    "suggested_fix": "Solución Sugerida",
+    "prepare_coding_agent": "Preparar Agente de Código",
+    "no_issues_found": "¡No se encontraron problemas!",
+    "project_in_great_shape": "Su proyecto está en excelente estado."
   },
   "pipeline_architect": {
     "vibe_mode": "Modo Vibe",

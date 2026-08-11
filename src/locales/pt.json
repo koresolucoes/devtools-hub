@@ -173,8 +173,15 @@
     "build": "Build",
     "deployment_readiness": "Prontidão de Deploy",
     "ci_cd": "CI / CD",
-    "findings": "Achados",
-    "architecture_stack": "Stack de Arquitetura"
+    "findings": "Descobertas",
+    "architecture_stack": "Stack de Arquitetura",
+    "privacy_notice": "A análise roda com segurança no seu navegador. Nenhum código é armazenado.",
+    "impact": "Impacto",
+    "evidence": "Evidência",
+    "suggested_fix": "Sugestão de Correção",
+    "prepare_coding_agent": "Preparar Agente",
+    "no_issues_found": "Nenhum problema encontrado!",
+    "project_in_great_shape": "O seu projeto está em ótima forma."
   },
   "pipeline_architect": {
     "vibe_mode": "Modo Vibe",
