@@ -74,9 +74,10 @@ export default function HealthDashboard({ health, project }) {
       <div className={styles.categories}>
         <CategoryScore name="Quality" result={health.categories.quality} />
         <CategoryScore name="Security" result={health.categories.security} />
-        <CategoryScore name="Architecture" result={health.categories.architecture} />
-        <CategoryScore name="Dependencies" result={health.categories.dependencies} />
+        <CategoryScore name="Build" result={health.categories.build} />
+        <CategoryScore name="Deployment" result={health.categories.deployment} />
         <CategoryScore name="CI / CD" result={health.categories.ci} />
+        <CategoryScore name="Maintainability" result={health.categories.maintainability} />
       </div>
     </div>
   );

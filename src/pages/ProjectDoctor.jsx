@@ -47,6 +47,33 @@ export default function ProjectDoctor() {
     if (e.key === 'Enter') handleAnalyze(url);
   };
 
+  const [loadingLogs, setLoadingLogs] = useState([]);
+  
+  useEffect(() => {
+    if (status === 'ANALYZING') {
+      const logs = [
+        '[System] Initializing DevsHub Project Doctor engine...',
+        '[Network] Fetching repository metadata...',
+        '[Parser] Extracting package manifests and dependencies...',
+        '[Scanner] Cross-referencing OSV vulnerability database...',
+        '[Analyzer] Detecting languages, frameworks, and tools...',
+        '[Rules] Evaluating CI/CD and architecture health...',
+        '[Engine] Finalizing project IR and generating remediation...'
+      ];
+      let currentLogIndex = 0;
+      setLoadingLogs([]);
+      
+      const interval = setInterval(() => {
+        if (currentLogIndex < logs.length) {
+          setLoadingLogs(prev => [...prev, logs[currentLogIndex]]);
+          currentLogIndex++;
+        }
+      }, 600); // add a new log every 600ms
+      
+      return () => clearInterval(interval);
+    }
+  }, [status]);
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -91,9 +118,16 @@ export default function ProjectDoctor() {
       <main className={styles.main}>
         {status === 'ANALYZING' && (
           <div className={styles.loadingState}>
-            <RefreshCcw size={48} className={`spin ${styles.loadingIcon}`} />
+            <Terminal size={48} className={styles.loadingIcon} style={{ animation: 'pulse 2s infinite' }} />
             <h2>Analyzing Repository...</h2>
-            <p>Fetching project tree, running rules, and scoring architecture.</p>
+            <div className={styles.terminalContainer}>
+              {loadingLogs.map((log, index) => (
+                <div key={index} className={styles.terminalLog}>
+                  <span style={{ color: 'var(--success)' }}>➜</span> {log}
+                </div>
+              ))}
+              <div className={styles.terminalCursor}>_</div>
+            </div>
           </div>
         )}
 
