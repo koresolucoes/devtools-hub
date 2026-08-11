@@ -24,7 +24,7 @@ export function createEmptyProjectIR(repo: RepositoryContext): ProjectIR {
     },
     
     quality: {
-      tests: [],
+      tests: { tools: [], commands: [], files: [] },
       linters: [],
       typecheckers: []
     },

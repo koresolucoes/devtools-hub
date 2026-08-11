@@ -6,90 +6,147 @@ export function runSecurityChecks(ir: ProjectIR, context: AnalysisContext): Chec
   const { vulnerabilities } = context;
   const results: CheckResult[] = [];
 
-  // DEP001: Lockfile present (Wait, this is a dependency check, but let's put it here or skip for now)
-  // The user wanted specific check results.
+  // SEC001: Dependency vulnerability scan completed.
+  if (ir.dependencies.length > 0) {
+    results.push({
+      id: 'SEC001',
+      category: 'security',
+      status: 'pass',
+      evidence: [{ source: 'OSV', message: `Scanned ${ir.dependencies.length} dependencies.` }]
+    });
+  } else {
+    results.push({ id: 'SEC001', category: 'security', status: 'not-applicable' });
+  }
 
-  if (vulnerabilities.length === 0) {
-    // If we have dependencies and no vulnerabilities, it's a pass.
-    if (ir.dependencies.length > 0) {
-      results.push({
-        id: 'SEC001-PASS',
-        ruleId: 'SEC001',
-        category: 'security',
-        title: 'Known vulnerabilities scan',
-        status: 'pass',
-        weight: 100,
-        confidence: 'high',
-        evidence: [{ message: 'No known vulnerabilities found in resolved dependencies.', source: 'OSV' }]
-      });
-    } else {
-      results.push({
-        id: 'SEC001-NA',
-        ruleId: 'SEC001',
-        category: 'security',
-        title: 'Known vulnerabilities scan',
-        status: 'not-applicable',
-        weight: 100,
-        confidence: 'high',
-        evidence: [{ message: 'No dependencies found to scan.', source: 'OSV' }]
-      });
-    }
+  if (ir.dependencies.length === 0) {
     return results;
   }
 
-  // Group vulnerabilities by package
+  // Group vulnerabilities to analyze severity
+  let hasCriticalProd = false;
+  let hasHighProd = false;
+  let hasCriticalOrHighDirect = false;
+
   const packageVulns = new Map<string, typeof vulnerabilities>();
+
   for (const v of vulnerabilities) {
-    if (!packageVulns.has(v.packageName)) {
-      packageVulns.set(v.packageName, []);
+    // Unique key: package@version
+    const key = `${v.packageName}@${v.resolvedVersion || 'unknown'}`;
+    if (!packageVulns.has(key)) {
+      packageVulns.set(key, []);
     }
-    packageVulns.get(v.packageName)!.push(v);
+    packageVulns.get(key)!.push(v);
+
+    const isProd = !v.dev;
+    const isDirect = v.direct;
+
+    if (v.severity === 'critical') {
+      if (isProd) hasCriticalProd = true;
+      if (isDirect && (v.severity === 'critical' || v.severity === 'high')) hasCriticalOrHighDirect = true;
+    } else if (v.severity === 'high') {
+      if (isProd) hasHighProd = true;
+      if (isDirect) hasCriticalOrHighDirect = true;
+    }
   }
 
-  // Determine highest severity
-  let highestSeverity: 'critical' | 'high' | 'medium' | 'low' | 'info' = 'low';
-  const severityRank = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1, 'info': 0, 'unknown': 1 };
-  
-  for (const v of vulnerabilities) {
-    const rank = severityRank[v.severity as keyof typeof severityRank] || 1;
-    if (rank > severityRank[highestSeverity as keyof typeof severityRank]) {
-      highestSeverity = v.severity as any;
-    }
-  }
-
-  // Format evidence per package
-  const evidences = Array.from(packageVulns.entries()).map(([pkg, vulns]) => {
-    return {
-      message: `${vulns.length} advisory(ies) found`,
-      value: pkg,
-      source: 'OSV',
-      path: vulns[0].dev ? 'devDependencies' : 'dependencies'
-    };
-  });
-
-  results.push({
-    id: 'SEC001-FAIL',
-    ruleId: 'SEC001',
-    category: 'security',
-    title: 'Known vulnerabilities scan',
-    status: 'fail',
-    weight: 100,
-    confidence: 'high',
-    evidence: evidences,
-    finding: {
-      id: `SECURITY001`,
-      title: `${packageVulns.size} packages have known vulnerabilities (${vulnerabilities.length} advisories)`,
-      description: 'The project uses dependencies with known security vulnerabilities.',
-      severity: highestSeverity,
+  // SEC002: No critical production advisories.
+  if (hasCriticalProd) {
+    results.push({
+      id: 'SEC002',
       category: 'security',
-      impact: 'Attackers could potentially exploit these vulnerabilities if the affected code paths are reachable in your application.',
-      remediation: {
-        summary: 'Update affected dependencies to their safe versions.',
-        steps: ['Run `npm audit fix` or manually update versions in package.json to the fixed versions.', 'Check the OSV database links for each advisory for specific remediation steps.']
-      },
-      evidence: evidences
+      status: 'fail',
+      finding: {
+        id: 'SEC002',
+        title: 'Critical Production Vulnerabilities',
+        severity: 'critical',
+        description: 'Critical vulnerabilities were found in production dependencies.',
+        impact: 'Attackers can likely compromise the production application.',
+        remediation: 'Immediately update the affected production dependencies to patched versions.'
+      }
+    });
+  } else {
+    results.push({ id: 'SEC002', category: 'security', status: 'pass' });
+  }
+
+  // SEC003: No high production advisories.
+  if (hasHighProd) {
+    results.push({
+      id: 'SEC003',
+      category: 'security',
+      status: 'fail',
+      finding: {
+        id: 'SEC003',
+        title: 'High Production Vulnerabilities',
+        severity: 'high',
+        description: 'High severity vulnerabilities were found in production dependencies.',
+        impact: 'Elevated risk of production exploit.',
+        remediation: 'Update the affected production dependencies.'
+      }
+    });
+  } else {
+    results.push({ id: 'SEC003', category: 'security', status: 'pass' });
+  }
+
+  // SEC004: No critical/high direct dependency advisories.
+  if (hasCriticalOrHighDirect) {
+    results.push({
+      id: 'SEC004',
+      category: 'security',
+      status: 'fail',
+      finding: {
+        id: 'SEC004',
+        title: 'Direct Dependency Vulnerabilities',
+        severity: 'high',
+        description: 'Critical or High severity vulnerabilities were found in direct dependencies.',
+        impact: 'Directly imported code is vulnerable, increasing exploitability risk.',
+        remediation: 'Update the direct dependencies in your package.json.'
+      }
+    });
+  } else {
+    results.push({ id: 'SEC004', category: 'security', status: 'pass' });
+  }
+
+  // Create a master summary finding if there are vulnerabilities
+  if (vulnerabilities.length > 0) {
+    let highestSeverity: 'critical' | 'high' | 'moderate' | 'low' | 'unknown' = 'unknown';
+    const severityRank = { 'critical': 4, 'high': 3, 'moderate': 2, 'low': 1, 'unknown': 0 };
+    
+    for (const v of vulnerabilities) {
+      const rank = severityRank[v.severity as keyof typeof severityRank] || 0;
+      if (rank > severityRank[highestSeverity as keyof typeof severityRank]) {
+        highestSeverity = v.severity as any;
+      }
     }
-  });
+
+    const evidences = Array.from(packageVulns.entries()).map(([pkgKey, vulns]) => {
+      // pkgKey is "name@version"
+      const isProd = vulns.some(v => !v.dev);
+      const isDirect = vulns.some(v => v.direct);
+      return {
+        message: `${vulns.length} advisory(ies)`,
+        value: pkgKey,
+        source: 'OSV',
+        path: `${isProd ? 'Production' : 'Development'} · ${isDirect ? 'Direct' : 'Transitive'}`
+      };
+    });
+
+    // We push a 'not-applicable' check status, but attach the summary finding.
+    // This allows it to show in the UI without artificially skewing the numeric score further.
+    results.push({
+      id: 'SEC_SUMMARY',
+      category: 'security',
+      status: 'unknown',
+      finding: {
+        id: 'SECURITY_SUMMARY',
+        title: `${packageVulns.size} affected package versions (${vulnerabilities.length} advisories)`,
+        description: 'The project uses dependencies with known security vulnerabilities.',
+        severity: highestSeverity,
+        impact: 'Varies by advisory. Review affected packages.',
+        remediation: 'Update affected dependencies to their safe versions.',
+        evidence: evidences
+      }
+    });
+  }
 
   return results;
 }

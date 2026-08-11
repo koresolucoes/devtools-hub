@@ -1,5 +1,5 @@
-import React from 'react';
-import { ShieldAlert, AlertTriangle, Info, ArrowRight, Code } from 'lucide-react';
+import React, { useState } from 'react';
+import { ShieldAlert, AlertTriangle, Info, ArrowRight, Code, Check } from 'lucide-react';
 import styles from './FindingsList.module.css';
 
 const SeverityBadge = ({ severity }) => {
@@ -12,7 +12,7 @@ const SeverityBadge = ({ severity }) => {
   } else if (severity === 'high') {
     colorClass = styles.severityHigh;
     Icon = AlertTriangle;
-  } else if (severity === 'medium') {
+  } else if (severity === 'moderate') {
     colorClass = styles.severityMedium;
     Icon = AlertTriangle;
   }
@@ -25,19 +25,56 @@ const SeverityBadge = ({ severity }) => {
 };
 
 const FindingCard = ({ finding }) => {
-  const handleCopyAgentPrompt = () => {
-    const prompt = `Please fix the following issue in my repository:
-    
-Issue: ${finding.title}
-Category: ${finding.category}
-Impact: ${finding.impact || 'N/A'}
+  const [copied, setCopied] = useState(false);
 
-Suggested Fix: ${finding.remediation.summary}
-${finding.remediation.instructions ? '\nSteps:\n' + finding.remediation.instructions.map((i, idx) => `${idx + 1}. ${i}`).join('\n') : ''}
-${finding.remediation.affectedFiles ? '\nAffected Files:\n' + finding.remediation.affectedFiles.join(', ') : ''}`;
+  const handleCopyAgentPrompt = () => {
+    const remediationText = typeof finding.remediation === 'string' 
+      ? finding.remediation 
+      : finding.remediation?.summary || 'Fix the issue.';
+
+    const prompt = `---
+[PROJECT CONTEXT]
+Please fix the following issue in my repository.
+
+[ISSUE DETAILS]
+- Finding: ${finding.title}
+- Category: ${finding.category}
+- Impact: ${finding.impact || 'N/A'}
+
+[EVIDENCE]
+${finding.evidence ? finding.evidence.map(e => `- ${e.value ? e.value + ': ' : ''}${e.message}`).join('\n') : 'N/A'}
+
+[REMEDIATION CONSTRAINTS]
+${remediationText}
+---`;
     
     navigator.clipboard.writeText(prompt);
-    alert('Copied prompt to clipboard!');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const renderRemediation = () => {
+    if (!finding.remediation) return null;
+    
+    if (typeof finding.remediation === 'string') {
+      return <p className={styles.remediationSummary}>{finding.remediation}</p>;
+    }
+
+    return (
+      <>
+        <p className={styles.remediationSummary}>{finding.remediation.summary}</p>
+        {finding.remediation.steps && finding.remediation.steps.length > 0 && (
+          <div className={styles.remediationSteps}>
+            {finding.remediation.steps.map((inst, i) => (
+              <div key={i} className={styles.step}>
+                <div className={styles.stepNumber}>{i + 1}</div>
+                <div className={styles.stepText}>{inst}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </>
+    );
   };
 
   return (
@@ -65,7 +102,9 @@ ${finding.remediation.affectedFiles ? '\nAffected Files:\n' + finding.remediatio
             {finding.evidence.map((ev, idx) => (
               <li key={idx}>
                 {ev.file && <code className={styles.evidenceFile}>{ev.file}</code>}
+                {ev.value && <strong className={styles.evidenceValue}>{ev.value}</strong>}
                 <span>{ev.message}</span>
+                {ev.path && <span className={styles.evidencePath}>({ev.path})</span>}
               </li>
             ))}
           </ul>
@@ -77,21 +116,11 @@ ${finding.remediation.affectedFiles ? '\nAffected Files:\n' + finding.remediatio
           <div className={styles.remediationHeader}>
             <Code size={16} /> Suggested Fix
           </div>
-          <p className={styles.remediationSummary}>{finding.remediation.summary}</p>
-          
-          {finding.remediation.instructions && finding.remediation.instructions.length > 0 && (
-            <div className={styles.remediationSteps}>
-              {finding.remediation.instructions.map((inst, i) => (
-                <div key={i} className={styles.step}>
-                  <div className={styles.stepNumber}>{i + 1}</div>
-                  <div className={styles.stepText}>{inst}</div>
-                </div>
-              ))}
-            </div>
-          )}
+          {renderRemediation()}
           
           <button className={styles.exportAgentButton} onClick={handleCopyAgentPrompt}>
-            Prepare for Coding Agent <ArrowRight size={14} />
+            {copied ? <Check size={14} /> : 'Prepare for Coding Agent'}
+            {!copied && <ArrowRight size={14} />}
           </button>
         </div>
       )}
@@ -110,9 +139,9 @@ export default function FindingsList({ findings }) {
     );
   }
 
-  // Sort by severity (critical > high > medium > low)
-  const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-  const sortedFindings = [...findings].sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
+  // Sort by severity (critical > high > moderate > low)
+  const severityOrder = { critical: 0, high: 1, moderate: 2, low: 3, unknown: 4 };
+  const sortedFindings = [...findings].sort((a, b) => (severityOrder[a.severity] || 4) - (severityOrder[b.severity] || 4));
 
   return (
     <div className={styles.list}>

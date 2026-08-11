@@ -1,8 +1,8 @@
 import type { Evidence, Confidence } from '../project/types';
 
-export type FindingSeverity = 'critical' | 'high' | 'medium' | 'low' | 'info';
+export type FindingSeverity = 'critical' | 'high' | 'medium' | 'moderate' | 'low' | 'info' | 'unknown';
 
-export type FindingCategory = 'build' | 'security' | 'quality' | 'ci' | 'deployment' | 'environment' | 'maintainability';
+export type FindingCategory = 'build' | 'security' | 'quality' | 'ci' | 'deployment' | 'environment' | 'maintainability' | 'architecture' | 'dependencies';
 
 export interface Remediation {
   summary: string;
@@ -18,10 +18,10 @@ export interface Finding {
   title: string;
   description: string;
   severity: FindingSeverity;
-  category: FindingCategory;
+  category?: FindingCategory;
   impact: string;
-  remediation: Remediation;
-  evidence: Evidence[];
+  remediation: Remediation | string;
+  evidence?: Evidence[];
   ruleId?: string;
   confidence?: Confidence;
 }

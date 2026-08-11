@@ -24,7 +24,8 @@ export interface DetectedTechnology {
     | 'typechecking' 
     | 'ai' 
     | 'agent' 
-    | 'tooling';
+    | 'tooling'
+    | 'buildTool';
   version?: string;
   confidence: Confidence;
   evidence: Evidence[];
@@ -130,7 +131,11 @@ export interface ProjectIR {
   };
   
   quality: {
-    tests: DetectedTechnology[];
+    tests: {
+      tools: DetectedTechnology[];
+      commands: string[];
+      files: string[];
+    };
     linters: DetectedTechnology[];
     typecheckers: DetectedTechnology[];
   };

@@ -20,7 +20,7 @@ export function runCIRules(ir: ProjectIR): CheckResult[] {
       }],
       finding: {
         id: 'CI001',
-        title: 'Missing Continuous Integration',
+        title: 'No repository CI workflow detected',
         description: 'No CI tool like GitHub Actions or GitLab CI was detected.',
         severity: 'low',
         category: 'ci',

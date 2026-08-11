@@ -136,6 +136,25 @@ export default function ProjectDoctor() {
 
         {status === 'SUCCESS' && result && (
           <div className={styles.resultsContainer}>
+            <div className={styles.projectSummary}>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Files</span>
+                <span className={styles.summaryValue}>{result.project.files.length}</span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Dependencies</span>
+                <span className={styles.summaryValue}>{result.project.dependencies.length}</span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Frameworks & Tools</span>
+                <span className={styles.summaryValue}>{result.project.frameworks.length}</span>
+              </div>
+              <div className={styles.summaryItem}>
+                <span className={styles.summaryLabel}>Coverage</span>
+                <span className={styles.summaryValue}>{result.health.coverage}%</span>
+              </div>
+            </div>
+
             <HealthDashboard health={result.health} project={result.project} />
             
             <div className={styles.tabs}>

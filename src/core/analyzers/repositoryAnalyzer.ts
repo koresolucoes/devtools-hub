@@ -142,11 +142,12 @@ export async function analyzeRepository(provider: RepositoryProvider): Promise<P
   
   ir.dependencies = resolveDependencies(declaredDeps, resolvedDeps);
 
-  // Deduplicate dependencies that might have been parsed multiple times
+  // Deduplicate dependencies preserving exact installations
   const depMap = new Map();
   for (const dep of ir.dependencies) {
-    if (!depMap.has(dep.name)) {
-      depMap.set(dep.name, dep);
+    const key = `${dep.ecosystem}:${dep.name}:${dep.resolvedVersion || dep.declaredRange}:${dep.packagePath || 'root'}`;
+    if (!depMap.has(key)) {
+      depMap.set(key, dep);
     }
   }
   ir.dependencies = Array.from(depMap.values());

@@ -6,28 +6,33 @@ import { findRecommendedFixedVersion } from './fixedVersion';
 const OSV_API_URL = 'https://api.osv.dev/v1/querybatch';
 
 export async function scanDependencies(dependencies: Dependency[]): Promise<DependencyVulnerability[]> {
-  const queries: OSVQuery[] = [];
-  const queryToDepMap: Record<number, Dependency> = {};
+  const uniqueQueries = new Map<string, { query: OSVQuery; deps: Dependency[] }>();
 
-  let queryIndex = 0;
   for (const dep of dependencies) {
     if (dep.resolutionStatus === 'resolved' && dep.resolvedVersion) {
-      queries.push({
-        package: {
-          name: dep.name,
-          ecosystem: dep.ecosystem === 'npm' ? 'npm' : 'PyPI'
-        },
-        version: dep.resolvedVersion
-      });
-      queryToDepMap[queryIndex] = dep;
-      queryIndex++;
+      const key = `${dep.ecosystem}:${dep.name}:${dep.resolvedVersion}`;
+      if (!uniqueQueries.has(key)) {
+        uniqueQueries.set(key, {
+          query: {
+            package: {
+              name: dep.name,
+              ecosystem: dep.ecosystem === 'npm' ? 'npm' : 'PyPI'
+            },
+            version: dep.resolvedVersion
+          },
+          deps: []
+        });
+      }
+      uniqueQueries.get(key)!.deps.push(dep);
     }
   }
 
+  const queryItems = Array.from(uniqueQueries.values());
+  const queries = queryItems.map(q => q.query);
   if (queries.length === 0) return [];
 
   const chunkSize = 500;
-  const rawResults: { dep: Dependency; slimVulns: { id: string }[] }[] = [];
+  const rawResults: { deps: Dependency[]; slimVulns: { id: string }[] }[] = [];
 
   for (let i = 0; i < queries.length; i += chunkSize) {
     const chunk = queries.slice(i, i + chunkSize);
@@ -49,14 +54,14 @@ export async function scanDependencies(dependencies: Dependency[]): Promise<Depe
         const result = data.results[index];
         if (result.vulns && result.vulns.length > 0) {
           rawResults.push({
-            dep: queryToDepMap[i + index],
+            deps: queryItems[i + index].deps,
             slimVulns: result.vulns
           });
         }
       }
     } catch (error) {
       console.error("Error querying OSV API:", error);
-      throw error; // Will be caught by runChecks and marked as incomplete
+      throw error; 
     }
   }
 
@@ -70,7 +75,6 @@ export async function scanDependencies(dependencies: Dependency[]): Promise<Depe
 
   const detailedVulns = new Map<string, OSVVulnerability>();
   
-  // Fetch details with limited concurrency (e.g. 6)
   const fetchDetail = async (id: string) => {
     try {
       const res = await fetch(`https://api.osv.dev/v1/vulns/${id}`);
@@ -90,28 +94,31 @@ export async function scanDependencies(dependencies: Dependency[]): Promise<Depe
     await Promise.all(batch.map(fetchDetail));
   }
 
-  // Format final vulnerabilities
   const finalVulns: DependencyVulnerability[] = [];
 
   for (const res of rawResults) {
     for (const slim of res.slimVulns) {
       const detail = detailedVulns.get(slim.id);
-      if (detail && res.dep.resolvedVersion) {
-        const fixed = findRecommendedFixedVersion(detail, res.dep.resolvedVersion, res.dep.name, res.dep.ecosystem);
-        
-        finalVulns.push({
-          advisoryId: detail.id,
-          packageName: res.dep.name,
-          resolvedVersion: res.dep.resolvedVersion,
-          ecosystem: res.dep.ecosystem,
-          severity: normalizeSeverity(detail),
-          direct: res.dep.direct,
-          dev: res.dep.dev,
-          transitive: res.dep.transitive,
-          summary: detail.summary || detail.id || 'Security vulnerability',
-          sourceUrl: detail.references?.[0]?.url || `https://osv.dev/vulnerability/${detail.id}`,
-          fixedVersion: fixed
-        });
+      if (detail) {
+        for (const dep of res.deps) {
+          if (dep.resolvedVersion) {
+            const fixed = findRecommendedFixedVersion(detail, dep.resolvedVersion, dep.name, dep.ecosystem);
+            
+            finalVulns.push({
+              advisoryId: detail.id,
+              packageName: dep.name,
+              resolvedVersion: dep.resolvedVersion,
+              ecosystem: dep.ecosystem,
+              severity: normalizeSeverity(detail),
+              direct: dep.direct,
+              dev: dep.dev,
+              transitive: dep.transitive,
+              summary: detail.summary || detail.id || 'Security vulnerability',
+              sourceUrl: detail.references?.[0]?.url || `https://osv.dev/vulnerability/${detail.id}`,
+              fixedVersion: fixed
+            });
+          }
+        }
       }
     }
   }

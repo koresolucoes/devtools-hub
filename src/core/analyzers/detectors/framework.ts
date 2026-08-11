@@ -16,6 +16,20 @@ export function detectFrameworks(ctx: DetectorContext): DetectedTechnology[] {
     }
   }
 
+  // --- Frameworks ---
+
+  // Angular
+  if (deps['@angular/core']) {
+    frameworks.push({
+      id: 'angular',
+      name: 'Angular',
+      category: 'framework',
+      version: deps['@angular/core'],
+      confidence: 'high',
+      evidence: [{ source: 'package.json', message: 'Detected @angular/core dependency' }]
+    });
+  }
+
   // Next.js
   if (deps['next'] || ctx.files.has('next.config.js') || ctx.files.has('next.config.mjs')) {
     frameworks.push({
@@ -28,30 +42,90 @@ export function detectFrameworks(ctx: DetectorContext): DetectedTechnology[] {
     });
   }
 
-  // React
+  // Nuxt
+  if (deps['nuxt'] || ctx.files.has('nuxt.config.ts') || ctx.files.has('nuxt.config.js')) {
+    frameworks.push({
+      id: 'nuxt',
+      name: 'Nuxt',
+      category: 'framework',
+      version: deps['nuxt'],
+      confidence: 'high',
+      evidence: [{ source: deps['nuxt'] ? 'package.json' : 'nuxt.config.*', message: 'Detected Nuxt configuration or dependency' }]
+    });
+  }
+  
+  // SvelteKit
+  if (deps['@sveltejs/kit'] || ctx.files.has('svelte.config.js')) {
+    frameworks.push({
+      id: 'sveltekit',
+      name: 'SvelteKit',
+      category: 'framework',
+      version: deps['@sveltejs/kit'],
+      confidence: 'high',
+      evidence: [{ source: deps['@sveltejs/kit'] ? 'package.json' : 'svelte.config.*', message: 'Detected SvelteKit configuration or dependency' }]
+    });
+  }
+
+  // React (only if not Next.js, or just as a secondary framework)
   if (deps['react']) {
     frameworks.push({
       id: 'react',
       name: 'React',
       category: 'framework',
       version: deps['react'],
-      confidence: 'high',
+      confidence: deps['next'] ? 'medium' : 'high',
       evidence: [{ source: 'package.json', message: 'Detected react dependency' }]
     });
   }
 
-  // Vite
-  if (deps['vite'] || ctx.files.has('vite.config.ts') || ctx.files.has('vite.config.js')) {
+  // Vue
+  if (deps['vue']) {
     frameworks.push({
-      id: 'vite',
-      name: 'Vite',
+      id: 'vue',
+      name: 'Vue',
       category: 'framework',
-      version: deps['vite'],
-      confidence: 'high',
-      evidence: [{ source: deps['vite'] ? 'package.json' : 'vite.config.*', message: 'Detected Vite configuration or dependency' }]
+      version: deps['vue'],
+      confidence: deps['nuxt'] ? 'medium' : 'high',
+      evidence: [{ source: 'package.json', message: 'Detected vue dependency' }]
     });
   }
-  
+
+  // Svelte
+  if (deps['svelte']) {
+    frameworks.push({
+      id: 'svelte',
+      name: 'Svelte',
+      category: 'framework',
+      version: deps['svelte'],
+      confidence: deps['@sveltejs/kit'] ? 'medium' : 'high',
+      evidence: [{ source: 'package.json', message: 'Detected svelte dependency' }]
+    });
+  }
+
+  // Express
+  if (deps['express']) {
+    frameworks.push({
+      id: 'express',
+      name: 'Express',
+      category: 'framework',
+      version: deps['express'],
+      confidence: 'high',
+      evidence: [{ source: 'package.json', message: 'Detected express dependency' }]
+    });
+  }
+
+  // Fastify
+  if (deps['fastify']) {
+    frameworks.push({
+      id: 'fastify',
+      name: 'Fastify',
+      category: 'framework',
+      version: deps['fastify'],
+      confidence: 'high',
+      evidence: [{ source: 'package.json', message: 'Detected fastify dependency' }]
+    });
+  }
+
   // NestJS
   if (deps['@nestjs/core']) {
     frameworks.push({
@@ -64,10 +138,10 @@ export function detectFrameworks(ctx: DetectorContext): DetectedTechnology[] {
     });
   }
 
-  // Python Frameworks from requirements.txt
+  // --- Python Frameworks ---
   const reqTxt = ctx.files.get('requirements.txt');
   if (reqTxt?.content) {
-    if (reqTxt.content.includes('fastapi')) {
+    if (reqTxt.content.toLowerCase().includes('fastapi')) {
       frameworks.push({
         id: 'fastapi',
         name: 'FastAPI',
@@ -76,7 +150,7 @@ export function detectFrameworks(ctx: DetectorContext): DetectedTechnology[] {
         evidence: [{ source: 'requirements.txt', message: 'Detected fastapi in requirements' }]
       });
     }
-    if (reqTxt.content.includes('Flask')) {
+    if (reqTxt.content.toLowerCase().includes('flask')) {
       frameworks.push({
         id: 'flask',
         name: 'Flask',
@@ -85,7 +159,7 @@ export function detectFrameworks(ctx: DetectorContext): DetectedTechnology[] {
         evidence: [{ source: 'requirements.txt', message: 'Detected Flask in requirements' }]
       });
     }
-    if (reqTxt.content.includes('Django')) {
+    if (reqTxt.content.toLowerCase().includes('django')) {
       frameworks.push({
         id: 'django',
         name: 'Django',
@@ -94,6 +168,46 @@ export function detectFrameworks(ctx: DetectorContext): DetectedTechnology[] {
         evidence: [{ source: 'requirements.txt', message: 'Detected Django in requirements' }]
       });
     }
+  }
+
+  // --- Build Tools ---
+
+  // Vite
+  if (deps['vite'] || ctx.files.has('vite.config.ts') || ctx.files.has('vite.config.js')) {
+    frameworks.push({
+      id: 'vite',
+      name: 'Vite',
+      category: 'buildTool', // classified correctly as buildTool
+      version: deps['vite'],
+      confidence: 'high',
+      evidence: [{ source: deps['vite'] ? 'package.json' : 'vite.config.*', message: 'Detected Vite configuration or dependency' }]
+    });
+  }
+
+  // Webpack
+  if (deps['webpack'] || ctx.files.has('webpack.config.js')) {
+    frameworks.push({
+      id: 'webpack',
+      name: 'Webpack',
+      category: 'buildTool',
+      version: deps['webpack'],
+      confidence: 'high',
+      evidence: [{ source: deps['webpack'] ? 'package.json' : 'webpack.config.js', message: 'Detected Webpack' }]
+    });
+  }
+
+  // --- Integrations / Tooling ---
+
+  // AnalogJS
+  if (deps['@analogjs/vite-plugin-angular']) {
+    frameworks.push({
+      id: 'analogjs',
+      name: 'AnalogJS Vite Plugin',
+      category: 'tooling',
+      version: deps['@analogjs/vite-plugin-angular'],
+      confidence: 'high',
+      evidence: [{ source: 'package.json', message: 'Detected @analogjs/vite-plugin-angular' }]
+    });
   }
 
   return frameworks;

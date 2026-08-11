@@ -67,7 +67,7 @@ export interface DependencyVulnerability {
   packageName: string;
   resolvedVersion: string;
   ecosystem: string;
-  severity: 'critical' | 'high' | 'medium' | 'low' | 'unknown';
+  severity: 'critical' | 'high' | 'moderate' | 'low' | 'unknown';
   direct: boolean;
   dev: boolean;
   transitive: boolean;

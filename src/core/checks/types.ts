@@ -15,12 +15,12 @@ export type HealthCategory =
 
 export interface CheckResult {
   id: string;
-  ruleId: string;
+  ruleId?: string;
   category: HealthCategory;
-  title: string;
+  title?: string;
   status: CheckStatus;
-  weight: number;
-  confidence: 'high' | 'medium' | 'low';
-  evidence: Evidence[];
+  weight?: number;
+  confidence?: 'high' | 'medium' | 'low';
+  evidence?: Evidence[];
   finding?: Finding;
 }

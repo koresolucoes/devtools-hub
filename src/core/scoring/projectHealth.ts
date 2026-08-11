@@ -105,11 +105,17 @@ export function calculateProjectHealth(ir: ProjectIR, checks: CheckResult[]): Pr
     shipStatus = 'ready-with-warnings';
   }
 
+  const globalTotalEvaluated = Object.values(categories).reduce((acc, cat) => acc + cat.checksPassed + cat.checksFailed, 0);
+  const globalTotalUnknown = Object.values(categories).reduce((acc, cat) => acc + cat.checksUnknown, 0);
+  const globalCoverage = (globalTotalEvaluated + globalTotalUnknown) > 0 
+    ? Math.round((globalTotalEvaluated / (globalTotalEvaluated + globalTotalUnknown)) * 100) 
+    : 0;
+
   return {
     score: Math.round(finalScore),
     rating,
     confidence,
-    coverage: totalCategoriesScored > 0 ? 100 : 0, // Simplified global coverage for now
+    coverage: globalCoverage,
     shipStatus,
     categories
   };
