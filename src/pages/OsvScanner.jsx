@@ -1,16 +1,18 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import FileUpload from '../components/FileUpload';
 import VulnerabilityReport from '../components/VulnerabilityReport';
 import { scanDependencies } from '../core/security/osvClient';
 import { packageJsonParser } from '../core/dependencies/packageJson';
 import { packageLockParser } from '../core/dependencies/packageLock';
 import { requirementsTxtParser } from '../core/dependencies/requirementsTxt';
-import { ShieldAlert, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ShieldAlert, ArrowRight, RefreshCcw } from 'lucide-react';
 import { tools } from '../data/contentModel';
 import '../index.css';
 
 function OsvScanner() {
+  const { t } = useTranslation('osv_scanner');
   const [appState, setAppState] = useState('upload'); // 'upload', 'scanning', 'report', 'error'
   const [errorMsg, setErrorMsg] = useState('');
   const [vulnerabilities, setVulnerabilities] = useState([]);
@@ -89,10 +91,10 @@ function OsvScanner() {
           )}
 
           {appState === 'scanning' && (
-            <div className="card loader-container">
-              <div className="loader"></div>
-              <h3>Analyzing dependencies...</h3>
-              <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>Querying the Google OSV database</p>
+            <div className="card text-center" style={{ padding: '4rem 2rem' }}>
+              <RefreshCcw size={48} className="spin" style={{ color: 'var(--accent)', margin: '0 auto 1.5rem auto' }} />
+              <h3>{t('analyzing')}</h3>
+              <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>{t('querying_osv')}</p>
             </div>
           )}
 
@@ -105,10 +107,11 @@ function OsvScanner() {
           )}
 
           {appState === 'error' && (
-            <div className="card" style={{ padding: '3rem', textAlign: 'center', marginTop: '2rem' }}>
-              <h2 style={{ color: 'var(--danger)', marginBottom: '1rem' }}>Oops! Something went wrong.</h2>
-              <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>{errorMsg}</p>
-              <button className="button" onClick={resetState}>Try Again</button>
+            <div className="card text-center" style={{ padding: '4rem 2rem', background: 'rgba(239, 68, 68, 0.05)', border: '1px solid rgba(239, 68, 68, 0.2)' }}>
+              <ShieldAlert size={64} style={{ color: 'var(--danger)', margin: '0 auto 1.5rem auto' }} />
+              <h2 style={{ color: 'var(--danger)', marginBottom: '1rem' }}>{t('oops_error')}</h2>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>{errorMsg}</p>
+              <button className="button" onClick={resetState}>{t('try_again')}</button>
             </div>
           )}
         </section>
@@ -118,16 +121,16 @@ function OsvScanner() {
           <h2 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>What is {toolData.name}?</h2>
           <p style={{ marginBottom: '2rem', lineHeight: '1.6' }}>{toolData.longDescription}</p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginTop: '3rem' }}>
             <div>
-              <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Supported Ecosystems</h3>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>{t('supported_ecosystems')}</h3>
               <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.6' }}>
                 {toolData.supportedStacks.map(stack => <li key={stack}>{stack}</li>)}
               </ul>
             </div>
             
             <div>
-              <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Accepted Inputs</h3>
+              <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>{t('accepted_inputs')}</h3>
               <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.6' }}>
                 <li>package.json</li>
                 <li>package-lock.json</li>
@@ -138,13 +141,13 @@ function OsvScanner() {
             </div>
           </div>
 
-          <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>Output</h3>
+          <h3 style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}>{t('output')}</h3>
           <ul style={{ paddingLeft: '1.5rem', lineHeight: '1.6', marginBottom: '3rem' }}>
-            <li>Vulnerability ID</li>
-            <li>Affected package</li>
-            <li>Installed version</li>
-            <li>Severity</li>
-            <li>Recommended action</li>
+            <li>{t('vulnerability_id')}</li>
+            <li>{t('affected_package')}</li>
+            <li>{t('installed_version')}</li>
+            <li>{t('severity')}</li>
+            <li>{t('recommended_action')}</li>
           </ul>
 
           {toolData.faqs && toolData.faqs.length > 0 && (

@@ -1,8 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckCircle, AlertTriangle, AlertCircle, HelpCircle } from 'lucide-react';
 import styles from './HealthDashboard.module.css';
 
 const HealthGauge = ({ score, confidence }) => {
+  const { t } = useTranslation('project_doctor');
   let color = 'var(--danger)';
   if (score >= 80) color = 'var(--success)';
   else if (score >= 50) color = 'var(--warning)';
@@ -24,8 +26,8 @@ const HealthGauge = ({ score, confidence }) => {
         <span className={styles.gaugeLabel}>/ 100</span>
       </div>
       {confidence < 70 && (
-        <div className={styles.confidenceWarning} title="Low analysis confidence due to missing or unsupported files">
-          <HelpCircle size={14} /> Low Confidence
+        <div className={styles.confidenceWarning} title={t('low_confidence')}>
+          <HelpCircle size={14} /> {t('low_confidence')}
         </div>
       )}
     </div>
@@ -33,6 +35,7 @@ const HealthGauge = ({ score, confidence }) => {
 };
 
 const CategoryScore = ({ name, result }) => {
+  const { t } = useTranslation('project_doctor');
   let icon = <CheckCircle size={20} color="var(--success)" />;
   let valueColor = 'var(--success)';
   
@@ -54,49 +57,50 @@ const CategoryScore = ({ name, result }) => {
         <span className={styles.categoryName}>{name}</span>
       </div>
       <div className={styles.categoryValue} style={{ color: valueColor }}>
-        {result.score === null ? 'N/A' : `${result.score}%`}
+        {result.score === null ? t('na') : `${result.score}%`}
       </div>
     </div>
   );
 };
 
 export default function HealthDashboard({ health }) {
+  const { t } = useTranslation('project_doctor');
   let shipColor = 'var(--success)';
   let ShipIcon = CheckCircle;
-  let shipText = 'Ready to Ship';
+  let shipText = t('ready_to_ship');
   
   if (health.shipStatus === 'not-ready') {
     shipColor = 'var(--danger)';
     ShipIcon = AlertCircle;
-    shipText = 'Not Ready';
+    shipText = t('not_ready');
   } else if (health.shipStatus === 'ready-with-warnings') {
     shipColor = 'var(--warning)';
     ShipIcon = AlertTriangle;
-    shipText = 'Ready (Warnings)';
+    shipText = t('ready_warnings');
   }
 
   return (
     <div className={styles.dashboard}>
       <div className={styles.mainScore}>
-        <h3>Project Health</h3>
+        <h3>{t('project_health')}</h3>
         <HealthGauge score={health.score} confidence={health.analysisConfidence} />
         <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: shipColor, fontWeight: 'bold' }}>
           <ShipIcon size={20} />
           {shipText}
         </div>
         <p className={styles.scoreDescription}>
-          Based on architecture, dependencies, security, and quality rules. Analysis coverage: {health.coverage?.checkCoverage ?? 100}%.
+          {t('score_description', { coverage: health.coverage?.checkCoverage ?? 100 })}
         </p>
       </div>
 
       <div className={styles.categories}>
-        <CategoryScore name="Quality" result={health.categories.quality} />
-        <CategoryScore name="Security" result={health.categories.security} />
-        <CategoryScore name="Architecture" result={health.categories.architecture} />
-        <CategoryScore name="Dependencies" result={health.categories.dependencies} />
-        <CategoryScore name="Build" result={health.categories.build} />
-        <CategoryScore name="Deployment Readiness" result={health.categories.deployment} />
-        <CategoryScore name="CI / CD" result={health.categories.ci} />
+        <CategoryScore name={t('quality')} result={health.categories.quality} />
+        <CategoryScore name={t('security')} result={health.categories.security} />
+        <CategoryScore name={t('architecture')} result={health.categories.architecture} />
+        <CategoryScore name={t('dependencies')} result={health.categories.dependencies} />
+        <CategoryScore name={t('build')} result={health.categories.build} />
+        <CategoryScore name={t('deployment_readiness')} result={health.categories.deployment} />
+        <CategoryScore name={t('ci_cd')} result={health.categories.ci} />
       </div>
     </div>
   );

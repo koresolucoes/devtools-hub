@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Box, Search, ArrowRight, Check, Activity, Globe, Server, Terminal, Play, Layers, Triangle } from 'lucide-react';
 import { templates } from '../data/contentModel';
 import { useTranslation } from 'react-i18next';
+import { getLocalizedField } from '../utils/i18nHelper';
 import '../index.css';
 
 const getStackIcon = (stack) => {
@@ -25,7 +26,8 @@ const getStackIcon = (stack) => {
 };
 
 export default function TemplatesIndex() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language.split('-')[0];
   const navigate = useNavigate();
   const [filter, setFilter] = useState('All');
   
@@ -92,25 +94,27 @@ export default function TemplatesIndex() {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                   <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase' }}>
-                    {t(`templates.${tmp.slug}.category`, tmp.category)}
+                    {tmp.category}
                   </div>
                   {tmp.status && (
                     <div style={{ fontSize: '0.65rem', border: '1px solid var(--surface-border)', padding: '2px 6px', borderRadius: '4px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px', letterSpacing: '0.05em' }}>
-                      <Activity size={10} /> {t(`templates.status.${tmp.status.toLowerCase()}`, tmp.status)}
+                      <Activity size={10} /> {tmp.status}
                     </div>
                   )}
                 </div>
                 {tmp.tag && (
                   <div style={{ fontSize: '0.7rem', background: tmp.tag === 'POPULAR' ? 'rgba(234, 179, 8, 0.1)' : 'rgba(59, 130, 246, 0.1)', color: tmp.tag === 'POPULAR' ? '#eab308' : '#3b82f6', padding: '2px 8px', borderRadius: '12px', fontWeight: 600, letterSpacing: '0.05em' }}>
-                    {t(`templates.tag.${tmp.tag.toLowerCase()}`, tmp.tag)}
+                    {tmp.tag}
                   </div>
                 )}
               </div>
 
               {/* Title & Summary */}
-              <h3 style={{ fontSize: '1.4rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>{t(`templates.${tmp.slug}.title`, tmp.title)}</h3>
+              <h3 style={{ fontSize: '1.4rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>
+                {getLocalizedField(tmp, 'title', lang)}
+              </h3>
               <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: '1.5', minHeight: '44px' }}>
-                {t(`templates.${tmp.slug}.summary`, tmp.summary)}
+                {getLocalizedField(tmp, 'summary', lang)}
               </p>
 
               {/* Flowchart Preview */}

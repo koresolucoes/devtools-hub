@@ -1,8 +1,15 @@
+import { useTranslation } from 'react-i18next';
 import '../index.css';
 
 export default function Legal() {
+  const { t, i18n } = useTranslation('legal');
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '4rem 2rem' }}>
+      {i18n.language !== 'pt' && (
+        <div style={{ background: 'rgba(255, 171, 0, 0.1)', color: '#ffab00', padding: '1rem', borderRadius: '8px', marginBottom: '2rem', border: '1px solid rgba(255, 171, 0, 0.3)' }}>
+          {t('disclaimer')}
+        </div>
+      )}
       <header style={{ marginBottom: '3rem', borderBottom: '1px solid var(--surface-border)', paddingBottom: '2rem' }}>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', color: 'var(--text-primary)' }}>
           AVISO LEGAL

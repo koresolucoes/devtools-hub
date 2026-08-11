@@ -1,9 +1,13 @@
 import { useParams, Link } from 'react-router-dom';
 import { templates, tools } from '../data/contentModel';
+import { useTranslation } from 'react-i18next';
+import { getLocalizedField } from '../utils/i18nHelper';
 import { ArrowRight, Box } from 'lucide-react';
 import '../index.css';
 
 function TemplateDetail() {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language.split('-')[0];
   const { slug } = useParams();
   const templateData = templates.find(t => t.slug === slug);
 
@@ -14,15 +18,15 @@ function TemplateDetail() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "TechArticle",
-    "headline": templateData.title,
-    "description": templateData.summary,
+    "headline": getLocalizedField(templateData, 'title', lang),
+    "description": getLocalizedField(templateData, 'summary', lang),
     "articleSection": templateData.category
   };
 
   return (
     <div className="tool-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
-      <title>{templateData.title} — DevsHub Templates</title>
-      <meta name="description" content={templateData.summary} />
+      <title>{getLocalizedField(templateData, 'title', lang)} — DevsHub Templates</title>
+      <meta name="description" content={getLocalizedField(templateData, 'summary', lang)} />
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
 
       <header className="header" style={{ marginBottom: '3rem', marginTop: '2rem' }}>
@@ -31,9 +35,9 @@ function TemplateDetail() {
           {templateData.category}
         </div>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-          {templateData.title}
+          {getLocalizedField(templateData, 'title', lang)}
         </h1>
-        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)' }}>{templateData.summary}</p>
+        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)' }}>{getLocalizedField(templateData, 'summary', lang)}</p>
         
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginTop: '1rem' }}>
           {templateData.stack.map(s => (

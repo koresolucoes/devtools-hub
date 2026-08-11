@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { BrainCircuit, Settings, FileText, SplitSquareVertical, ArrowRight } from 'lucide-react';
 import { splitText } from '../services/textSplitter';
@@ -12,6 +13,7 @@ The Chunk Overlap defines how many characters from the end of the previous block
 In this visual tool, you can test different configurations and see exactly how your data would be processed before sending it to a vector database.`;
 
 function RagSandbox() {
+  const { t } = useTranslation('rag_sandbox');
   const toolData = tools.find(t => t.slug === 'rag-chunking-sandbox');
   const [text, setText] = useState(DEFAULT_TEXT);
   const [chunkSize, setChunkSize] = useState(250);
@@ -57,10 +59,10 @@ function RagSandbox() {
           {/* Left Panel: Input & Settings */}
           <div className="rag-sidebar">
             <div className="card p-4 mb-4">
-              <h3 className="section-title"><Settings size={20}/> Settings</h3>
+              <h3 className="section-title"><Settings size={20}/> {t('settings')}</h3>
               
               <div className="form-group">
-                <label>Chunk Size (Characters)</label>
+                <label>{t('chunk_size')}</label>
                 <input 
                   type="range" 
                   min="50" max="1000" step="10" 
@@ -72,7 +74,7 @@ function RagSandbox() {
               </div>
 
               <div className="form-group">
-                <label>Chunk Overlap (Characters)</label>
+                <label>{t('chunk_overlap')}</label>
                 <input 
                   type="range" 
                   min="0" max={Math.max(1, chunkSize - 1)} step="5" 
@@ -84,18 +86,18 @@ function RagSandbox() {
               </div>
 
               <div className="form-group">
-                <label>Separator</label>
+                <label>{t('separator')}</label>
                 <select value={separator} onChange={(e) => setSeparator(e.target.value)} className="select-input">
-                  <option value=" ">Space (Words)</option>
-                  <option value="\\n">New Line</option>
-                  <option value=". ">Period (Sentences)</option>
-                  <option value="">None (Brute force)</option>
+                  <option value=" ">{t('space')}</option>
+                  <option value="\\n">{t('newline')}</option>
+                  <option value=". ">{t('period')}</option>
+                  <option value="">{t('none')}</option>
                 </select>
               </div>
             </div>
 
             <div className="card p-4 input-panel">
-              <h3 className="section-title"><FileText size={20}/> Original Text</h3>
+              <h3 className="section-title"><FileText size={20}/> {t('original_text')}</h3>
               <textarea 
                 className="text-input"
                 value={text}
@@ -103,7 +105,7 @@ function RagSandbox() {
                 placeholder="Paste your long text here..."
               />
               <div className="stats-bar">
-                <span>{text.length} characters</span>
+                <span>{text.length} {t('characters')}</span>
               </div>
             </div>
           </div>
@@ -111,12 +113,12 @@ function RagSandbox() {
           {/* Right Panel: Output Visualizer */}
           <div className="rag-content card">
             <div className="content-header">
-              <h3 className="section-title mb-0"><SplitSquareVertical size={20}/> Chunk Visualizer</h3>
-              <div className="badge success">{chunks.length} Generated Chunks</div>
+              <h3 className="section-title mb-0"><SplitSquareVertical size={20}/> {t('chunk_visualizer')}</h3>
+              <div className="badge success">{chunks.length} {t('chunks')}</div>
             </div>
             <div className="chunks-container">
               {chunks.length === 0 ? (
-                <p className="text-secondary text-center mt-4">Type some text to see chunks.</p>
+                <p className="text-secondary text-center mt-4">{t('type_some_text')}</p>
               ) : (
                 chunks.map((chunk, idx) => (
                   <motion.div 

@@ -2,10 +2,12 @@ import { Link } from 'react-router-dom';
 import { BookOpen } from 'lucide-react';
 import { guides } from '../data/contentModel';
 import { useTranslation } from 'react-i18next';
+import { getLocalizedField } from '../utils/i18nHelper';
 import '../index.css';
 
 export default function GuidesIndex() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language.split('-')[0];
   return (
     <div style={{ maxWidth: '800px', margin: '0 auto', padding: '4rem 2rem' }}>
       <header style={{ marginBottom: '3rem' }}>
@@ -21,10 +23,10 @@ export default function GuidesIndex() {
         {guides.map(g => (
           <Link to={`/guides/${g.slug}`} key={g.slug} className="card" style={{ padding: '1.5rem', borderRadius: '8px', textDecoration: 'none', color: 'inherit' }}>
             <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.5rem' }}>
-              {g.category}
+              {getLocalizedField(g, 'category', lang)}
             </div>
-            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>{g.title}</h3>
-            <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.6' }}>{g.summary}</p>
+            <h3 style={{ fontSize: '1.25rem', marginBottom: '0.75rem', color: 'var(--text-primary)' }}>{getLocalizedField(g, 'title', lang)}</h3>
+            <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.6' }}>{getLocalizedField(g, 'summary', lang)}</p>
           </Link>
         ))}
       </div>

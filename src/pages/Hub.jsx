@@ -4,6 +4,7 @@ import { ShieldAlert, ArrowRight, Search, BookOpen, Box, Flag, Plug, Baseline, B
 import { useTranslation } from 'react-i18next';
 import TechFeed from '../components/TechFeed';
 import { tools, guides, templates } from '../data/contentModel';
+import { getLocalizedField } from '../utils/i18nHelper';
 import '../index.css';
 
 const getIcon = (slug) => {
@@ -18,7 +19,8 @@ const getIcon = (slug) => {
 };
 
 function Hub() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language.split('-')[0];
   
   const featuredToolSlug = 'project-doctor';
   const featuredTool = tools.find(t => t.slug === featuredToolSlug);
@@ -89,9 +91,9 @@ function Hub() {
                 </div>
                 <div className="tool-category-badge" style={{ marginBottom: 0 }}>{t('hub.featured_tool', 'FEATURED TOOL')}</div>
               </div>
-              <h2 style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>{featuredTool.name}</h2>
+              <h2 style={{ fontSize: '1.75rem', marginBottom: '0.5rem' }}>{getLocalizedField(featuredTool, 'name', lang)}</h2>
               <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', marginBottom: '1.5rem', maxWidth: '500px' }}>
-                {featuredTool.shortDescription}
+                {getLocalizedField(featuredTool, 'shortDescription', lang)}
               </p>
               <div className="tool-tags">
                 {featuredTool.features?.slice(0, 3).map(tag => (
@@ -123,9 +125,9 @@ function Hub() {
                     </span>
                   </div>
                   <div className="tool-card-content">
-                    <span className="tool-category-badge">{tool.category || 'Tool'}</span>
-                    <h3>{tool.name}</h3>
-                    <p>{tool.shortDescription}</p>
+                    <span className="tool-category-badge">{getLocalizedField(tool, 'category', lang) || 'Tool'}</span>
+                    <h3>{getLocalizedField(tool, 'name', lang)}</h3>
+                    <p>{getLocalizedField(tool, 'shortDescription', lang)}</p>
                     {tool.supportedStacks && (
                       <div className="tool-tags">
                         {tool.supportedStacks.slice(0, 3).map(tag => <span key={tag} className="tool-tag">{tag}</span>)}
@@ -144,9 +146,9 @@ function Hub() {
                     <span className="tool-status-badge soon">{t('hub.soon', 'Soon')}</span>
                   </div>
                   <div className="tool-card-content">
-                    <span className="tool-category-badge">{tool.category || 'Tool'}</span>
-                    <h3>{tool.name}</h3>
-                    <p>{tool.shortDescription}</p>
+                    <span className="tool-category-badge">{getLocalizedField(tool, 'category', lang) || 'Tool'}</span>
+                    <h3>{getLocalizedField(tool, 'name', lang)}</h3>
+                    <p>{getLocalizedField(tool, 'shortDescription', lang)}</p>
                   </div>
                   <div className="tool-card-action" style={{ opacity: 0.5 }}>
                     <span>{t('hub.coming_soon', 'Coming soon')}</span>
@@ -166,9 +168,9 @@ function Hub() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {guides.slice(0, 3).map(g => (
                 <Link to={`/guides/${g.slug}`} key={g.slug} className="card" style={{ padding: '1rem', borderRadius: '8px', textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{g.category}</div>
-                  <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{g.title}</h3>
-                  <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{g.summary}</p>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{getLocalizedField(g, 'category', lang)}</div>
+                  <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{getLocalizedField(g, 'title', lang)}</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{getLocalizedField(g, 'summary', lang)}</p>
                 </Link>
               ))}
             </div>
@@ -180,9 +182,9 @@ function Hub() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {templates.slice(0, 3).map(t => (
                 <Link to={`/templates/${t.slug}`} key={t.slug} className="card" style={{ padding: '1rem', borderRadius: '8px', textDecoration: 'none', color: 'inherit' }}>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{t.category}</div>
-                  <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{t.title}</h3>
-                  <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{t.summary}</p>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--accent)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>{getLocalizedField(t, 'category', lang)}</div>
+                  <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{getLocalizedField(t, 'title', lang)}</h3>
+                  <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{getLocalizedField(t, 'summary', lang)}</p>
                 </Link>
               ))}
             </div>

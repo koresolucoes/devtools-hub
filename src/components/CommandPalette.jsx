@@ -90,7 +90,7 @@ export default function CommandPalette({ isOpen, onClose, onSnippetSelect }) {
           <input 
             ref={inputRef}
             className="command-palette-input" 
-            placeholder="Search tools, snippets or commands..." 
+            placeholder={t('command_palette.search_placeholder', 'Search tools, snippets or commands...')} 
             value={query}
             onChange={e => { setQuery(e.target.value); setSelectedIndex(0); }}
           />

@@ -99,12 +99,12 @@ function Layout() {
                 <Terminal size={18} /> DevsHub
               </div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', lineHeight: '1.6' }}>
-                Tools, templates, and intelligence for developers who want to build fast and ship like engineers.
+                {t('layout.footer.slogan', 'Tools, templates, and intelligence for developers who want to build fast and ship like engineers.')}
               </p>
             </div>
             
             <div>
-              <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Developer Tools</h4>
+              <h4 style={{ color: 'var(--text-primary)', marginBottom: '1rem', fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t('layout.footer.developer_tools', 'Developer Tools')}</h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <li><Link to="/tools/pipeline-architect" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>Pipeline Architect</Link></li>
                 <li><Link to="/tools/osv-dependency-scanner" style={{ color: 'var(--text-secondary)', textDecoration: 'none', fontSize: '0.9rem' }}>OSV Dependency Scanner</Link></li>

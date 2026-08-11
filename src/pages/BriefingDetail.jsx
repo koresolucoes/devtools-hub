@@ -1,39 +1,43 @@
 import { useParams } from 'react-router-dom';
 import { briefing } from '../data/contentModel';
 import { Calendar } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { getLocalizedField } from '../utils/i18nHelper';
 import '../index.css';
 
 function BriefingDetail() {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language.split('-')[0];
   const { slug } = useParams();
   const briefingData = briefing.find(b => b.slug === slug);
 
   if (!briefingData) {
-    return <div style={{ padding: '4rem', textAlign: 'center' }}>Briefing not found.</div>;
+    return <div style={{ padding: '4rem', textAlign: 'center' }}>{t('translation.hub.briefingNotFound', 'Briefing not found.')}</div>;
   }
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": briefingData.title,
-    "description": briefingData.summary,
-    "datePublished": briefingData.date
+    "headline": getLocalizedField(briefingData, 'title', lang),
+    "description": getLocalizedField(briefingData, 'summary', lang),
+    "datePublished": getLocalizedField(briefingData, 'date', lang)
   };
 
   return (
     <div className="tool-container" style={{ maxWidth: '800px', margin: '0 auto', padding: '0 1rem' }}>
-      <title>{briefingData.title}</title>
-      <meta name="description" content={briefingData.summary} />
+      <title>{getLocalizedField(briefingData, 'title', lang)}</title>
+      <meta name="description" content={getLocalizedField(briefingData, 'summary', lang)} />
       <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
 
       <header className="header" style={{ marginBottom: '3rem', marginTop: '2rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent)', marginBottom: '1rem', fontSize: '0.9rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           <Calendar size={16} />
-          {briefingData.date}
+          {getLocalizedField(briefingData, 'date', lang)}
         </div>
         <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem', letterSpacing: '-0.02em', color: 'var(--text-primary)' }}>
-          {briefingData.title}
+          {getLocalizedField(briefingData, 'title', lang)}
         </h1>
-        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)' }}>{briefingData.summary}</p>
+        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)' }}>{getLocalizedField(briefingData, 'summary', lang)}</p>
       </header>
 
       <main style={{ marginBottom: '4rem' }}>

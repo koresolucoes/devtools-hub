@@ -98,22 +98,48 @@ export const tools = [
     slug: 'token-estimator',
     id: 'token-estimator',
     name: 'Token Estimator & Pricing',
+    pt_name: 'Calculadora e Estimador de Tokens',
+    es_name: 'Calculadora y Estimador de Tokens',
     shortDescription: 'Calculate LLM context size and costs across providers.',
+    pt_shortDescription: 'Calcule o tamanho do contexto e os custos de LLMs em vários provedores.',
+    es_shortDescription: 'Calcule el tamaño del contexto y los costos de LLM en varios proveedores.',
     longDescription: 'Estimate token counts for text prompts and calculate costs across various LLM providers including OpenAI, Anthropic, and Google Gemini.',
+    pt_longDescription: 'Estime a contagem de tokens para prompts de texto e calcule os custos em vários provedores de LLM, incluindo OpenAI, Anthropic e Google Gemini.',
+    es_longDescription: 'Estime el recuento de tokens para prompts de texto y calcule los costos en varios proveedores de LLM, incluyendo OpenAI, Anthropic y Google Gemini.',
     icon: 'Baseline',
     status: 'stable',
     category: 'AI Engineering',
     tags: ['LLM'],
     supportedStacks: ['OpenAI', 'Anthropic', 'Gemini'],
     seoTitle: 'LLM Token Estimator & Pricing Calculator',
+    pt_seoTitle: 'Estimador de Tokens LLM e Calculadora de Preços',
+    es_seoTitle: 'Estimador de Tokens LLM y Calculadora de Precios',
     seoDescription: 'Calculate token counts and estimate costs for OpenAI, Anthropic, and Gemini models instantly.',
+    pt_seoDescription: 'Calcule a contagem de tokens e estime os custos para os modelos da OpenAI, Anthropic e Gemini instantaneamente.',
+    es_seoDescription: 'Calcule el recuento de tokens y estime los costos para los modelos de OpenAI, Anthropic y Gemini instantáneamente.',
     features: [
       'Live token counting',
       'Multi-model pricing estimates',
       'Instant comparisons'
     ],
+    pt_features: [
+      'Contagem de tokens em tempo real',
+      'Estimativas de preços de vários modelos',
+      'Comparações instantâneas'
+    ],
+    es_features: [
+      'Conteo de tokens en tiempo real',
+      'Estimaciones de precios de varios modelos',
+      'Comparaciones instantáneas'
+    ],
     faqs: [
       { q: 'Are token counts exact?', a: 'We use standard tokenizers like cl100k_base to give highly accurate estimates, though final API counts may vary slightly.' }
+    ],
+    pt_faqs: [
+      { q: 'As contagens de tokens são exatas?', a: 'Usamos tokenizadores padrão como cl100k_base para fornecer estimativas altamente precisas, embora as contagens finais da API possam variar ligeiramente.' }
+    ],
+    es_faqs: [
+      { q: '¿Son exactos los recuentos de tokens?', a: 'Utilizamos tokenizadores estándar como cl100k_base para proporcionar estimaciones altamente precisas, aunque los recuentos finales de la API pueden variar ligeramente.' }
     ],
     relatedTools: ['rag-chunking-sandbox']
   },

@@ -1,7 +1,9 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { UploadCloud, FileJson, Link2, ArrowRight } from 'lucide-react';
 
 export default function FileUpload({ onFileUpload }) {
+  const { t } = useTranslation();
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState(null);
   const [githubUrl, setGithubUrl] = useState('');
@@ -24,7 +26,7 @@ export default function FileUpload({ onFileUpload }) {
     
     // Accept package.json, requirements.txt
     if (file.name !== 'package.json' && file.name !== 'requirements.txt') {
-      setError('Por favor, selecione um arquivo suportado (package.json ou requirements.txt).');
+      setError(t('error_unsupported_file'));
       return;
     }
 
@@ -33,7 +35,7 @@ export default function FileUpload({ onFileUpload }) {
       onFileUpload(e.target.result, file.name);
     };
     reader.onerror = () => {
-      setError('Erro ao ler o arquivo.');
+      setError(t('error_reading_file'));
     };
     reader.readAsText(file);
   };
@@ -80,16 +82,16 @@ export default function FileUpload({ onFileUpload }) {
             branch = parts[3];
           }
         } else {
-          throw new Error('URL incompleta.');
+          throw new Error(t('error_incomplete_url'));
         }
       } catch (e) {
-        throw new Error('URL inválida. Use o formato https://github.com/usuario/repositorio');
+        throw new Error(t('error_invalid_url'));
       }
 
       let res;
       if (branch) {
         res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/package.json`);
-        if (!res.ok) throw new Error(`package.json não encontrado na branch '${branch}'.`);
+        if (!res.ok) throw new Error(t('error_package_json_not_found_branch', { branch }));
       } else {
         // Tenta main primeiro, depois master
         res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/main/package.json`);
@@ -99,14 +101,14 @@ export default function FileUpload({ onFileUpload }) {
       }
 
       if (!res.ok) {
-        throw new Error('Não foi possível encontrar o package.json na branch main ou master deste repositório.');
+        throw new Error(t('error_package_json_not_found'));
       }
 
       const textContent = await res.text();
       onFileUpload(textContent, 'package.json');
     } catch (err) {
       console.error(err);
-      setError(err.message || 'Erro ao buscar dados do GitHub.');
+      setError(err.message || t('error_github_fetch'));
     } finally {
       setIsLoadingGithub(false);
     }
@@ -114,7 +116,7 @@ export default function FileUpload({ onFileUpload }) {
 
   return (
     <div className="card" style={{ padding: '2rem', marginTop: '2rem' }}>
-      <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Verifique suas dependências</h2>
+      <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>{t('verify_dependencies')}</h2>
       
       <div 
         className={`upload-area ${dragActive ? 'drag-active' : ''}`}
@@ -126,8 +128,8 @@ export default function FileUpload({ onFileUpload }) {
         style={{ marginBottom: '2rem' }}
       >
         <UploadCloud size={48} className="upload-icon" />
-        <p className="upload-text">Arraste e solte o package.json aqui</p>
-        <p className="upload-subtext">Ou clique para selecionar do seu computador</p>
+        <p className="upload-text">{t('drag_drop')}</p>
+        <p className="upload-subtext">{t('click_to_select')}</p>
         
         <input 
           ref={inputRef}
@@ -140,7 +142,7 @@ export default function FileUpload({ onFileUpload }) {
 
       <div style={{ display: 'flex', alignItems: 'center', margin: '2rem 0' }}>
         <div style={{ flex: 1, height: '1px', background: 'var(--surface-border)' }}></div>
-        <span style={{ padding: '0 1rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>OU</span>
+        <span style={{ padding: '0 1rem', color: 'var(--text-secondary)', fontSize: '0.875rem' }}>{t('or')}</span>
         <div style={{ flex: 1, height: '1px', background: 'var(--surface-border)' }}></div>
       </div>
 
