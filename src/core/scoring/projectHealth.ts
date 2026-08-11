@@ -17,18 +17,22 @@ export interface ProjectHealth {
     ci: HealthCategoryResult;
     deployment: HealthCategoryResult;
     maintainability: HealthCategoryResult;
+    architecture: HealthCategoryResult;
+    dependencies: HealthCategoryResult;
   };
 }
 
 export function calculateProjectHealth(ir: ProjectIR, findings: Finding[]): ProjectHealth {
   // Weights (Relative)
   const WEIGHTS = {
-    build: 20,
-    security: 25,
-    quality: 15,
+    build: 15,
+    security: 20,
+    quality: 10,
     ci: 15,
     deployment: 10,
-    maintainability: 15
+    maintainability: 10,
+    architecture: 10,
+    dependencies: 10
   };
 
   const categories: Record<keyof typeof WEIGHTS, HealthCategoryResult> = {
@@ -37,15 +41,21 @@ export function calculateProjectHealth(ir: ProjectIR, findings: Finding[]): Proj
     quality: { score: 100, status: 'scored' },
     ci: { score: 100, status: 'scored' },
     deployment: { score: 100, status: 'scored' },
-    maintainability: { score: 100, status: 'scored' }
+    maintainability: { score: 100, status: 'scored' },
+    architecture: { score: 100, status: 'scored' },
+    dependencies: { score: 100, status: 'scored' }
   };
 
   // Determine insufficient data
   if (!ir.manifests.length && !ir.scripts.build) categories.build.status = 'insufficient-data';
   if (!ir.infrastructure.ci) categories.ci.status = 'insufficient-data';
   if (!ir.infrastructure.deployments.length) categories.deployment.status = 'insufficient-data';
-  if (ir.dependencies.length === 0) categories.security.status = 'insufficient-data';
+  if (ir.dependencies.length === 0) {
+    categories.security.status = 'insufficient-data';
+    categories.dependencies.status = 'insufficient-data';
+  }
   if (ir.quality.tests.length === 0 && ir.quality.linters.length === 0) categories.quality.status = 'insufficient-data';
+  if (ir.frameworks.length === 0 && ir.languages.length === 0) categories.architecture.status = 'insufficient-data';
 
   // Penalties
   for (const finding of findings) {
