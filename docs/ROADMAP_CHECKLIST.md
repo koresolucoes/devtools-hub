@@ -1,27 +1,27 @@
 # DevsHub Roadmap Checklist
 
 ## Milestone 0 — Trust & Correctness
-- [ ] Setup Vitest testing infrastructure (npm test, npm run test:watch, npm run test:coverage).
-- [ ] Add basic golden tests for pipeline configurations.
-- [ ] Introduce gradual TypeScript support for `src/core/`.
-- [ ] Audit existing claims vs actual implementation (and correct UI/Marketing).
-- [ ] Refactor OSV Scanner dependency detection to support accurate ecosystems (npm, PyPI).
-- [ ] Fix severity fallback in OSV scanner (unknown should not default to HIGH).
-- [ ] Move `pipelineIR.js` to `src/core/pipeline/` gracefully.
-- [ ] Mark GitLab CI as "Preview" if paridade is lacking.
-- [ ] Create `src/core/registries/actions.ts` to manage action versions securely.
-- [ ] Create `src/core/registries/models.ts` to decouple Token Estimator pricing.
-- [ ] Replace default Vite README with a proper product README.
-- [ ] Ensure Cmd/Ctrl + K (Command Palette) works globally.
+- [x] Setup Vitest testing infrastructure (npm test, npm run test:watch, npm run test:coverage).
+- [x] Add basic golden tests for pipeline configurations.
+- [x] Introduce gradual TypeScript support for `src/core/`.
+- [x] Audit existing claims vs actual implementation (and correct UI/Marketing).
+- [x] Refactor OSV Scanner dependency detection to support accurate ecosystems (npm, PyPI).
+- [x] Fix severity fallback in OSV scanner (unknown should not default to HIGH).
+- [x] Move `pipelineIR.js` to `src/core/pipeline/` gracefully.
+- [x] Mark GitLab CI as "Preview" if paridade is lacking.
+- [x] Create `src/core/registries/actions.ts` to manage action versions securely.
+- [x] Create `src/core/registries/models.ts` to decouple Token Estimator pricing.
+- [x] Replace default Vite README with a proper product README.
+- [x] Ensure Cmd/Ctrl + K (Command Palette) works globally.
 
 ## Milestone 1 — ProjectIR
-- [ ] Create `src/core/project/types.ts` and `createProjectIR.ts`.
+- [x] Create `src/core/project/types.ts` and `createProjectIR.ts`.
 
 ## Milestone 2 — Repository Analyzer
-- [ ] Create `repositoryAnalyzer.ts` and stack detectors (node, python, docker, etc.).
+- [x] Create `repositoryAnalyzer.ts` and stack detectors (node, python, docker, etc.).
 
 ## Milestone 3 — Rules Engine
-- [ ] Implement `src/core/rules/` with initial rule packs (CI, Build, Security, Quality).
+- [x] Implement `src/core/rules/` with initial rule packs (CI, Build, Security, Quality).
 
 ## Milestone 4 — Project Health Score
 - [ ] Implement `src/core/scoring/projectHealth.ts`.
